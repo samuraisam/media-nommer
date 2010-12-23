@@ -1,0 +1,224 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hacking on media-nommer &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
+    <link rel="next" title="API Reference" href="apiref/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="apiref/index.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="hacking-on-media-nommer">
+<h1>Hacking on media-nommer<a class="headerlink" href="#hacking-on-media-nommer" title="Permalink to this headline">¶</a></h1>
+<p>For those that are particularly ambitious, or generous enough to want to
+contribute to the project, the barrier to entry is reasonably low. We will go
+over a few topics at a high level to get you started.</p>
+<div class="section" id="obtaining-the-source">
+<h2>Obtaining the source<a class="headerlink" href="#obtaining-the-source" title="Permalink to this headline">¶</a></h2>
+<p>The best way to obtain the source is through our <a class="reference external" href="http://git-scm.com/">git</a> repository on <a class="reference external" href="https://github.com/">GitHub</a>.
+If you are going to do anything aside from poke at the code, I would <em>highly</em>
+recommend visiting our <a class="reference external" href="https://github.com/duointeractive/media-nommer">GitHub project</a> and forking the project via the
+<strong>Fork</strong> button.</p>
+<p>For those not familiar with <a class="reference external" href="https://github.com/">GitHub</a>, this will create a copy
+of the repository under your username which you have commit access to. From
+your repository, you can make modifications and send <em>Pull Requests</em> to the
+upstream project asking for your changes to be merged in. Meanwhile, you can
+keep your fork up to date with changes from upstream. This is a whole lot
+faster, easier, and more fun than the traditional patch juggling method.</p>
+<p>If you&#8217;d like to skip the whole <em>forking</em> ordeal and just get a copy of our
+upstream repository on your machine, you&#8217;ll probably want to do something like:</p>
+<div class="highlight-python"><pre>git clone https://gtaylor@github.com/duointeractive/media-nommer.git</pre>
+</div>
+<p>This will leave you with a <cite>media-nommer</cite> directory in your current directory.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">For those that aren&#8217;t familiar with <a class="reference external" href="http://git-scm.com/">git</a> and/or <a class="reference external" href="https://github.com/">GitHub</a>, see the
+excellent <a class="reference external" href="http://help.github.com/">GitHub help</a> with lots of helpful how-tos.</p>
+</div>
+</div>
+<div class="section" id="installing-additional-dependencies">
+<h2>Installing additional dependencies<a class="headerlink" href="#installing-additional-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>There are a few additional dependencies to install when doing development
+work. Since everyone is being good little programmers and working under
+<a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>, it&#8217;s just a matter of switching to said virtual environment and
+doing:</p>
+<div class="highlight-python"><pre>pip install nose sphinx</pre>
+</div>
+<p>Now you&#8217;re set to run unit tests and build our documentation.</p>
+</div>
+<div class="section" id="running-and-writing-unit-tests">
+<h2>Running and writing unit tests<a class="headerlink" href="#running-and-writing-unit-tests" title="Permalink to this headline">¶</a></h2>
+<p>Running unit tests is trivial with <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/">nose</a>. <cite>cd</cite> to your media-nommer directory
+and just run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">nose</span>
+</pre></div>
+</div>
+<p>The cool thing about <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/">nose</a> is that it will find anything that looks like a
+unit test throughout the entire codebase, without us having to tell it where
+to look.</p>
+<p>As far as writing unit tests, we&#8217;d like to shoot for full coverage, so please
+do write tests for your changes. If you are working on something new,
+find the <cite>tests.py</cite> module neighboring the one you&#8217;re working on (or create
+one if it doesn&#8217;t already exist) and write your unit tests using the standard
+Python <a class="reference external" href="http://docs.python.org/library/unittest.html">unittest</a> module. If you need any examples of how our unit tests look,
+run this to find all of our <cite>tests.py</cite> modules from your root <cite>media-nommer</cite>
+directory:</p>
+<div class="highlight-python"><pre>find . -name tests.py</pre>
+</div>
+<p>Look through these for a good idea of what we&#8217;re looking for.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">We are very unlikely to accept code contributions without unit tests. It
+is understood that writing unit tests is boring, tedious, and un-fun, but
+it is a necessary evil for complex software.</p>
+</div>
+</div>
+<div class="section" id="code-style">
+<h2>Code style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
+<p>We mostly adhere to <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP8</a>, and expect contributors to do the same. A few quick
+hi-lights:</p>
+<ul class="simple">
+<li>80 columns width max, unless absolutely necessary.</li>
+<li>Indents are 4 spaces, and not tabs. <strong>No tabs allowed</strong>.</li>
+<li>Avoid wildcard * imports unless absolutely necessary.</li>
+<li>No camelCase method names, use underscores and lowercase letters.</li>
+<li>Classes use CapWords.</li>
+<li>Global variables are ALL_UPPER_CASE.</li>
+<li>Comments and docstrings for just about everything. Even if you think it&#8217;s
+obvious. It probably won&#8217;t be a few weeks/months/years later.</li>
+</ul>
+</div>
+<div class="section" id="contributing-code">
+<h2>Contributing code<a class="headerlink" href="#contributing-code" title="Permalink to this headline">¶</a></h2>
+<p>After you have made modifications in your <a class="reference external" href="https://github.com/">GitHub</a> fork, you need only send
+a <em>Pull Request</em> to us via the aptly named <strong>Pull Request</strong> on your fork&#8217;s
+project page. See <a class="reference external" href="http://help.github.com/forking/">GitHub&#8217;s guide to forking</a>. It&#8217;s quick and easy, we
+promise.</p>
+</div>
+<div class="section" id="i-m-stumped-help">
+<h2>&#8220;I&#8217;m stumped, help!&#8221;<a class="headerlink" href="#i-m-stumped-help" title="Permalink to this headline">¶</a></h2>
+<p>The best way to get help right now is to submit an issue on the <a class="reference external" href="https://github.com/duointeractive/media-nommer/issues">issue tracker</a>.
+This is useful for questions, suggestions, and bugs.</p>
+</div>
+<div class="section" id="contributions-are-bsd-licensed">
+<h2>Contributions are BSD-licensed<a class="headerlink" href="#contributions-are-bsd-licensed" title="Permalink to this headline">¶</a></h2>
+<p>Important to note is the fact that all contributions to the media-nommer
+project are, like the project itself, BSD-licensed. Please make sure you or
+your employer are OK with this before contributing.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Hacking on media-nommer</a><ul>
+<li><a class="reference internal" href="#obtaining-the-source">Obtaining the source</a></li>
+<li><a class="reference internal" href="#installing-additional-dependencies">Installing additional dependencies</a></li>
+<li><a class="reference internal" href="#running-and-writing-unit-tests">Running and writing unit tests</a></li>
+<li><a class="reference internal" href="#code-style">Code style</a></li>
+<li><a class="reference internal" href="#contributing-code">Contributing code</a></li>
+<li><a class="reference internal" href="#i-m-stumped-help">&#8220;I&#8217;m stumped, help!&#8221;</a></li>
+<li><a class="reference internal" href="#contributions-are-bsd-licensed">Contributions are BSD-licensed</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="apiref/index.html"
+                        title="next chapter">API Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/hacking.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="apiref/index.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>

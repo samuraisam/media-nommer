@@ -56,6 +56,12 @@
 EC2 instances, schedules encoding jobs, handles response pings from
 external encoding services, and notifies your external applications when
 encoding has completed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only more general management logic should live in this module. Anything
+specific like encoding commands or EC2 management should live elsewhere.
+nommerd is just the orchestrator.</p>
+</div>
 </div>
 <div class="section" id="module-media_nommer.nommerd.conf">
 <span id="nommerd-conf"></span><h2>nommerd.conf<a class="headerlink" href="#module-media_nommer.nommerd.conf" title="Permalink to this headline">¶</a></h2>
