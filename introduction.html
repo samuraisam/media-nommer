@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>An Introduction to media-nommer &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="media-nommer: A Python-based media encoder service" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="an-introduction-to-media-nommer">
+<h1>An Introduction to media-nommer<a class="headerlink" href="#an-introduction-to-media-nommer" title="Permalink to this headline">¶</a></h1>
+<p>media-nommer is a Python project that aims to provide media encoding that
+scales to your needs in the cloud (<a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>, to be specific). This is not
+altogether special, and is a problem that has been solved by a good number of
+other efforts. However, we take a unique stance in that we provide a number
+of different encoding backends for different services and providers, without
+your having to deal with their respective APIs directly.</p>
+<div class="section" id="some-background">
+<h2>Some Background<a class="headerlink" href="#some-background" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned earlier, there are any number of various projects out there that
+handle encoding media on various services. We (<a class="reference external" href="http://duointeractive.com">DUO Interactive</a>) were searching
+for a suitable fit for two different projects that needed near-infinite media
+encoding scalability. However, the two projects were completely different in
+the way that the media files would be delivered and tracked, as well as the
+formats to be encoded to. Furthermore, there were/are certain formats that some
+services like Encoding.com handle much better/cheaper than our ideal of
+<a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a>.</p>
+<p>We needed a package that would let us send media directly to our encoding
+software, or grab it from S3 for encoding. Encoded output would need to be
+stored on S3 for distribution via <a class="reference external" href="http://aws.amazon.com/cloudfront/">CloudFront</a>. We also wanted to go the
+cheapest route, which sometimes meant using a more specialized third party
+service. We wanted to be able to selectively pipe certain media out to said
+third parties, and send the rest to our default <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> encoding
+plugin. And most importantly of all, we wanted the bulk of the setup work
+for a deployment of the software to be done in the config file, with the
+nasty stuff humming along out of sight.</p>
+<p>The result of all of this was the creation of media-nommer, a <a class="reference external" href="http://python.org">Python</a>-based
+media encoding system with a penchant for scalability and flexibility.</p>
+</div>
+<div class="section" id="a-high-level-overview">
+<h2>A high level overview<a class="headerlink" href="#a-high-level-overview" title="Permalink to this headline">¶</a></h2>
+<p>Intelligent distributed encoding requires a director or orchestrator to keep
+everything running as it should. Since we&#8217;ve targeted near-infinite scalability
+as a goal, we need to be able to hand out media to external services, as well
+as scale our own <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> instances up and down to meet demand. This is
+where the <a class="reference internal" href="apiref/nommerd.html#module-media_nommer.nommerd" title="media_nommer.nommerd"><tt class="xref py py-obj docutils literal"><span class="pre">nommerd</span></tt></a> daemon comes in.</p>
+<p>The nommerd manages the various <em>Nommers</em>, which are classes that manage the
+encoding service they abstract. For example, we have an EC2FFmpegNommer,
+as well as an EncodingDotComNommer. Each of these has methods that lets nommerd
+submit encoding jobs, receive notification of their success/failure, and
+deal with the output.</p>
+<p>nommerd also implements a simple JSON-based API for your custom software to
+query for pending or current encoding job states.</p>
+<p>And finally, upon completion of an encoding job, you may optionally have
+nommerd ping you back at a specified URL.</p>
+</div>
+<div class="section" id="that-s-a-lot-of-nommerd">
+<h2>That&#8217;s a lot of nommerd<a class="headerlink" href="#that-s-a-lot-of-nommerd" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll notice that we mention nommerd pretty frequently. We could have done
+without this guy if we went with a de-centralized <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> setup, but
+then we lose a lot of ability to blend Amazon AWS-based encoding with
+external encoding.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">An Introduction to media-nommer</a><ul>
+<li><a class="reference internal" href="#some-background">Some Background</a></li>
+<li><a class="reference internal" href="#a-high-level-overview">A high level overview</a></li>
+<li><a class="reference internal" href="#that-s-a-lot-of-nommerd">That&#8217;s a lot of nommerd</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">media-nommer: A Python-based media encoder service</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/introduction.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+             >previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>

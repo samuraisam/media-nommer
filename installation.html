@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
     <link rel="next" title="API Reference" href="apiref/index.html" />
-    <link rel="prev" title="media-nommer: A Python-based media encoder service" href="index.html" /> 
+    <link rel="prev" title="An Introduction to media-nommer" href="introduction.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,7 @@
           <a href="apiref/index.html" title="API Reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+          <a href="introduction.html" title="An Introduction to media-nommer"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>
@@ -55,6 +55,12 @@
 <p>Due to the early state of this project, there is a good chance that parts of
 these instructions are out of date at any given time. If you run into any such
 issue please let us know on our <a class="reference external" href="https://github.com/duointeractive/media-nommer/issues">issue tracker</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following instructions are directed at what your eventual production
+environment will need. Developers setting up a dev environment can omit
+anything that they don&#8217;t need (like daemonizing and process monitoring).</p>
+</div>
 <div class="section" id="assumptions">
 <h2>Assumptions<a class="headerlink" href="#assumptions" title="Permalink to this headline">¶</a></h2>
 <p>For the sake of sanity, good deployment practices, and uniformity, we&#8217;re
@@ -71,6 +77,28 @@ not currently supported.</li>
 <li>You have an <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a> account, and can create or destroy <a class="reference external" href="http://aws.amazon.com/s3/">S3</a> buckets.</li>
 </ul>
 </div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Some flavor of Linux, Unix, BSD, Mac OS, or POSIX compliant OS.</li>
+<li><a class="reference external" href="http://python.org">Python</a> 2.5 or higher, <a class="reference external" href="http://python.org">Python</a> 2.6 or 2.7 recommended. <a class="reference external" href="http://python.org">Python</a> 3.x is not
+supported (yet).</li>
+<li><a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> 10.x. We develop on 10.2.</li>
+<li><a class="reference external" href="http://boto.cloudhackers.com/">Boto</a> 2.0 or higher.</li>
+</ul>
+<p>The easiest way to satisfy these is to create your <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>, switch to
+it, and run the following:</p>
+<div class="highlight-python"><pre>pip install twisted boto</pre>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To be written once we have a better feel for the settings and
+configuration involved.</p>
+</div>
+</div>
 </div>
 
 
@@ -83,13 +111,15 @@ not currently supported.</li>
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#assumptions">Assumptions</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">media-nommer: A Python-based media encoder service</a></p>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">An Introduction to media-nommer</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="apiref/index.html"
                         title="next chapter">API Reference</a></p>
@@ -128,7 +158,7 @@ not currently supported.</li>
           <a href="apiref/index.html" title="API Reference"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+          <a href="introduction.html" title="An Introduction to media-nommer"
              >previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>
