@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>media_nommer.nommerd &mdash; media-nommer v1.0dev documentation</title>
+    <title>media_nommer.feederd &mdash; media-nommer v1.0dev documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -48,11 +48,11 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="media-nommer-nommerd">
-<span id="apiref-nommerd"></span><h1>media_nommer.nommerd<a class="headerlink" href="#media-nommer-nommerd" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-media_nommer.nommerd">
-<span id="nommerd"></span><h2>nommerd<a class="headerlink" href="#module-media_nommer.nommerd" title="Permalink to this headline">¶</a></h2>
-<p>The nommerd module contains Twisted daemon that monitors queues, creates
+  <div class="section" id="media-nommer-feederd">
+<span id="apiref-feederd"></span><h1>media_nommer.feederd<a class="headerlink" href="#media-nommer-feederd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-media_nommer.feederd">
+<span id="feederd"></span><h2>feederd<a class="headerlink" href="#module-media_nommer.feederd" title="Permalink to this headline">¶</a></h2>
+<p>The feederd module contains Twisted daemon that monitors queues, creates
 EC2 instances, schedules encoding jobs, handles response pings from
 external encoding services, and notifies your external applications when
 encoding has completed.</p>
@@ -60,28 +60,28 @@ encoding has completed.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">Only more general management logic should live in this module. Anything
 specific like encoding commands or EC2 management should live elsewhere.
-nommerd is just the orchestrator.</p>
+feederd is just the orchestrator.</p>
 </div>
 </div>
-<div class="section" id="module-media_nommer.nommerd.conf">
-<span id="nommerd-conf"></span><h2>nommerd.conf<a class="headerlink" href="#module-media_nommer.nommerd.conf" title="Permalink to this headline">¶</a></h2>
-<p>Import the <a class="reference internal" href="#media_nommer.nommerd.conf.settings" title="media_nommer.nommerd.conf.settings"><tt class="xref py py-obj docutils literal"><span class="pre">media_nommer.nommerd.conf.settings</span></tt></a> object in this module to get the master list of 
-global settings for nommerd. This involves pulling the default values, then
+<div class="section" id="module-media_nommer.feederd.conf">
+<span id="feederd-conf"></span><h2>feederd.conf<a class="headerlink" href="#module-media_nommer.feederd.conf" title="Permalink to this headline">¶</a></h2>
+<p>Import the <a class="reference internal" href="#media_nommer.feederd.conf.settings" title="media_nommer.feederd.conf.settings"><tt class="xref py py-obj docutils literal"><span class="pre">media_nommer.feederd.conf.settings</span></tt></a> object in this module to get the master list of 
+global settings for feederd. This involves pulling the default values, then
 overriding them with the user&#8217;s settings.</p>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
 <p class="last">Keep in mind that these settings and this module are only import
-to nommerd, not the rest of media-nommer&#8217;s components.</p>
+to feederd, not the rest of media-nommer&#8217;s components.</p>
 </div>
 <dl class="class">
-<dt id="media_nommer.nommerd.conf.SettingsStore">
-<em class="property">class </em><tt class="descclassname">media_nommer.nommerd.conf.</tt><tt class="descname">SettingsStore</tt><a class="reference internal" href="../_modules/media_nommer/nommerd/conf.html#SettingsStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.nommerd.conf.SettingsStore" title="Permalink to this definition">¶</a></dt>
+<dt id="media_nommer.feederd.conf.SettingsStore">
+<em class="property">class </em><tt class="descclassname">media_nommer.feederd.conf.</tt><tt class="descname">SettingsStore</tt><a class="reference internal" href="../_modules/media_nommer/feederd/conf.html#SettingsStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.conf.SettingsStore" title="Permalink to this definition">¶</a></dt>
 <dd><p>A really basic Python object that stores all of the settings from which
-nommerd runs on. Settings are just attributes on this object, and are
+feederd runs on. Settings are just attributes on this object, and are
 all uppercase.</p>
 <dl class="method">
-<dt id="media_nommer.nommerd.conf.SettingsStore.update_settings_from_module">
-<tt class="descname">update_settings_from_module</tt><big>(</big><em>settings_module</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/nommerd/conf.html#SettingsStore.update_settings_from_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.nommerd.conf.SettingsStore.update_settings_from_module" title="Permalink to this definition">¶</a></dt>
+<dt id="media_nommer.feederd.conf.SettingsStore.update_settings_from_module">
+<tt class="descname">update_settings_from_module</tt><big>(</big><em>settings_module</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/conf.html#SettingsStore.update_settings_from_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.conf.SettingsStore.update_settings_from_module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets attributes on this object based on the setting found in the
 given &#8216;settings_module&#8217; module.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -100,15 +100,15 @@ given &#8216;settings_module&#8217; module.</p>
 </dd></dl>
 
 <dl class="data">
-<dt id="media_nommer.nommerd.conf.settings">
-<tt class="descclassname">media_nommer.nommerd.conf.</tt><tt class="descname">settings</tt><a class="headerlink" href="#media_nommer.nommerd.conf.settings" title="Permalink to this definition">¶</a></dt>
+<dt id="media_nommer.feederd.conf.settings">
+<tt class="descclassname">media_nommer.feederd.conf.</tt><tt class="descname">settings</tt><a class="headerlink" href="#media_nommer.feederd.conf.settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the object you&#8217;ll want to import to get at the settings values.
 They are attributes on this object, and are all uppercase.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-media_nommer.nommerd.web">
-<span id="nommerd-web"></span><h2>nommerd.web<a class="headerlink" href="#module-media_nommer.nommerd.web" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-media_nommer.feederd.web">
+<span id="feederd-web"></span><h2>feederd.web<a class="headerlink" href="#module-media_nommer.feederd.web" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -120,10 +120,10 @@ They are attributes on this object, and are all uppercase.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">media_nommer.nommerd</a><ul>
-<li><a class="reference internal" href="#module-media_nommer.nommerd">nommerd</a></li>
-<li><a class="reference internal" href="#module-media_nommer.nommerd.conf">nommerd.conf</a></li>
-<li><a class="reference internal" href="#module-media_nommer.nommerd.web">nommerd.web</a></li>
+<li><a class="reference internal" href="#">media_nommer.feederd</a><ul>
+<li><a class="reference internal" href="#module-media_nommer.feederd">feederd</a></li>
+<li><a class="reference internal" href="#module-media_nommer.feederd.conf">feederd.conf</a></li>
+<li><a class="reference internal" href="#module-media_nommer.feederd.web">feederd.web</a></li>
 </ul>
 </li>
 </ul>
@@ -133,7 +133,7 @@ They are attributes on this object, and are all uppercase.</p>
                         title="previous chapter">API Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="../_sources/apiref/nommerd.txt"
+    <li><a href="../_sources/apiref/feederd.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">

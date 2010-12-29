@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
     <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="media-nommer: A Python-based media encoder service" href="index.html" /> 
+    <link rel="prev" title="media-nommer: A Python-based media encoder system" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,7 @@
           <a href="installation.html" title="Installation"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+          <a href="index.html" title="media-nommer: A Python-based media encoder system"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>
@@ -86,20 +86,20 @@ media encoding system with a penchant for scalability and flexibility.</p>
 everything running as it should. Since we&#8217;ve targeted near-infinite scalability
 as a goal, we need to be able to hand out media to external services, as well
 as scale our own <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> instances up and down to meet demand. This is
-where the <a class="reference internal" href="apiref/nommerd.html#module-media_nommer.nommerd" title="media_nommer.nommerd"><tt class="xref py py-obj docutils literal"><span class="pre">nommerd</span></tt></a> daemon comes in.</p>
-<p>The nommerd manages the various <em>Nommers</em>, which are classes that manage the
+where the <a class="reference internal" href="apiref/feederd.html#module-media_nommer.feederd" title="media_nommer.feederd"><tt class="xref py py-obj docutils literal"><span class="pre">feederd</span></tt></a> daemon comes in.</p>
+<p>The feederd manages the various <em>Nommers</em>, which are classes that manage the
 encoding service they abstract. For example, we have an EC2FFmpegNommer,
-as well as an EncodingDotComNommer. Each of these has methods that lets nommerd
+as well as an EncodingDotComNommer. Each of these has methods that lets feederd
 submit encoding jobs, receive notification of their success/failure, and
 deal with the output.</p>
-<p>nommerd also implements a simple JSON-based API for your custom software to
+<p>feederd also implements a simple JSON-based API for your custom software to
 query for pending or current encoding job states.</p>
 <p>And finally, upon completion of an encoding job, you may optionally have
-nommerd ping you back at a specified URL.</p>
+feederd ping you back at a specified URL.</p>
 </div>
-<div class="section" id="that-s-a-lot-of-nommerd">
-<h2>That&#8217;s a lot of nommerd<a class="headerlink" href="#that-s-a-lot-of-nommerd" title="Permalink to this headline">¶</a></h2>
-<p>You&#8217;ll notice that we mention nommerd pretty frequently. We could have done
+<div class="section" id="that-s-a-lot-of-feederd">
+<h2>That&#8217;s a lot of feederd<a class="headerlink" href="#that-s-a-lot-of-feederd" title="Permalink to this headline">¶</a></h2>
+<p>You&#8217;ll notice that we mention feederd pretty frequently. We could have done
 without this guy if we went with a de-centralized <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> setup, but
 then we lose a lot of ability to blend Amazon AWS-based encoding with
 external encoding.</p>
@@ -117,14 +117,14 @@ external encoding.</p>
 <li><a class="reference internal" href="#">An Introduction to media-nommer</a><ul>
 <li><a class="reference internal" href="#some-background">Some Background</a></li>
 <li><a class="reference internal" href="#a-high-level-overview">A high level overview</a></li>
-<li><a class="reference internal" href="#that-s-a-lot-of-nommerd">That&#8217;s a lot of nommerd</a></li>
+<li><a class="reference internal" href="#that-s-a-lot-of-feederd">That&#8217;s a lot of feederd</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">media-nommer: A Python-based media encoder service</a></p>
+                        title="previous chapter">media-nommer: A Python-based media encoder system</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="installation.html"
                         title="next chapter">Installation</a></p>
@@ -163,7 +163,7 @@ external encoding.</p>
           <a href="installation.html" title="Installation"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="media-nommer: A Python-based media encoder service"
+          <a href="index.html" title="media-nommer: A Python-based media encoder system"
              >previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>

@@ -1,0 +1,131 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.feederd.conf &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.feederd.conf</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Import the :py:obj:`media_nommer.feederd.conf.settings` object in this module to get the master list of </span>
+<span class="sd">global settings for feederd. This involves pulling the default values, then</span>
+<span class="sd">overriding them with the user&#39;s settings.</span>
+
+<span class="sd">.. tip:: Keep in mind that these settings and this module are only import</span>
+<span class="sd">         to feederd, not the rest of media-nommer&#39;s components.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">media_nommer.feederd.conf</span> <span class="kn">import</span> <span class="n">default_settings</span>
+
+<div class="viewcode-block" id="SettingsStore"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.conf.SettingsStore">[docs]</a><span class="k">class</span> <span class="nc">SettingsStore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A really basic Python object that stores all of the settings from which</span>
+<span class="sd">    feederd runs on. Settings are just attributes on this object, and are</span>
+<span class="sd">    all uppercase.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pull the default settings at load time. Later on, the feederd Twisted </span>
+<span class="sd">        plugin over-writes these values with the user&#39;s settings </span>
+<span class="sd">        where applicable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_settings_from_module</span><span class="p">(</span><span class="n">default_settings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SettingsStore.update_settings_from_module"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.conf.SettingsStore.update_settings_from_module">[docs]</a>    <span class="k">def</span> <span class="nf">update_settings_from_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings_module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets attributes on this object based on the setting found in the</span>
+<span class="sd">        given &#39;settings_module&#39; module.</span>
+<span class="sd">        </span>
+<span class="sd">        :param settings_module: The settings  module to update from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">setting</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">settings_module</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="n">setting</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings_module</span><span class="p">,</span> <span class="n">setting</span><span class="p">))</span>
+
+</div></div>
+<span class="n">settings</span> <span class="o">=</span> <span class="n">SettingsStore</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This is the object you&#39;ll want to import to get at the settings values.</span>
+<span class="sd">They are attributes on this object, and are all uppercase.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
