@@ -86,22 +86,23 @@ media encoding system with a penchant for scalability and flexibility.</p>
 everything running as it should. Since we&#8217;ve targeted near-infinite scalability
 as a goal, we need to be able to hand out media to external services, as well
 as scale our own <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> instances up and down to meet demand. This is
-where the <a class="reference internal" href="apiref/feederd.html#module-media_nommer.feederd" title="media_nommer.feederd"><tt class="xref py py-obj docutils literal"><span class="pre">feederd</span></tt></a> daemon comes in.</p>
-<p>The feederd manages the various <em>Nommers</em>, which are classes that manage the
-encoding service they abstract. For example, we have an EC2FFmpegNommer,
+where the <a class="reference internal" href="feederd.html"><em>feederd</em></a> daemon comes in.</p>
+<p>The <a class="reference internal" href="feederd.html"><em>feederd</em></a> manages the various <em>Nommers</em>, which are classes that manage
+the encoding service they abstract. For example, we have
+<tt class="xref py py-class docutils literal"><span class="pre">EC2FFmpegNommer</span></tt>,
 as well as an EncodingDotComNommer. Each of these has methods that lets feederd
 submit encoding jobs, receive notification of their success/failure, and
 deal with the output.</p>
-<p>feederd also implements a simple JSON-based API for your custom software to
-query for pending or current encoding job states.</p>
+<p><a class="reference internal" href="feederd.html"><em>feederd</em></a> also implements a simple JSON-based API for your custom software
+to query for pending or current encoding job states.</p>
 <p>And finally, upon completion of an encoding job, you may optionally have
-feederd ping you back at a specified URL.</p>
+<a class="reference internal" href="feederd.html"><em>feederd</em></a> ping you back at a specified URL.</p>
 </div>
 <div class="section" id="that-s-a-lot-of-feederd">
 <h2>That&#8217;s a lot of feederd<a class="headerlink" href="#that-s-a-lot-of-feederd" title="Permalink to this headline">¶</a></h2>
-<p>You&#8217;ll notice that we mention feederd pretty frequently. We could have done
-without this guy if we went with a de-centralized <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> setup, but
-then we lose a lot of ability to blend Amazon AWS-based encoding with
+<p>You&#8217;ll notice that we mention <a class="reference internal" href="feederd.html"><em>feederd</em></a> pretty frequently. We could have
+done without this guy if we went with a de-centralized <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> + <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> setup, but
+then we lose a lot of ability to blend <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>-based encoding with
 external encoding.</p>
 </div>
 </div>
