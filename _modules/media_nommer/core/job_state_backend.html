@@ -436,7 +436,14 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">job</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_get_job_object_from_item</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;JobStateBackend.get_unfinished_jobs(): Unable to instantiate job: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">item</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;JobStateBackend.get_unfinished_jobs(): &quot;</span> \
+                          <span class="s">&quot;Unable to instantiate job: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">item</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message_or_obj</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;JobStateBackend.get_unfinished_jobs(): &quot;</span> \
+                          <span class="s">&quot;Invalid nommer specified for job: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">item</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message_or_obj</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
                 <span class="k">continue</span>

@@ -1,0 +1,148 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using feederd’s JSON API &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
+    <link rel="next" title="Hacking on media-nommer" href="hacking.html" />
+    <link rel="prev" title="ec2nommerd" href="ec2nommerd.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hacking.html" title="Hacking on media-nommer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="ec2nommerd"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-feederd-s-json-api">
+<h1>Using feederd&#8217;s JSON API<a class="headerlink" href="#using-feederd-s-json-api" title="Permalink to this headline">¶</a></h1>
+<p>One of <a class="reference internal" href="feederd.html"><em>feederd</em></a>&#8216;s roles is hosting a web-based JSON API for your
+custom applications to communicate through. With this API, you may do such
+things as:</p>
+<ul class="simple">
+<li>Schedule encoding jobs</li>
+<li>Check the state of existing encoding jobs (To be implemented)</li>
+</ul>
+<p>By using a simple web-based API, you are free to either use one of the existing
+client API libraries, or write your own.</p>
+<div class="section" id="client-api-libraries">
+<span id="id1"></span><h2>Client API Libraries<a class="headerlink" href="#client-api-libraries" title="Permalink to this headline">¶</a></h2>
+<p>The following API client libraries are for forming and sending JSON queries
+to media-nommer&#8217;s RESTful API. This is important for sending and checking on
+encoding jobs. Your applications will use the API to make media-nommer do
+something (other than stare at you blankly).</p>
+<p>If you create a library of your own, let us know via the issue tracker and
+we&#8217;ll add yours to the list.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/duointeractive/media-nommer-api-python">media-nommer-api</a> (<a class="reference external" href="http://python.org">Python</a>)</li>
+</ul>
+</div>
+<div class="section" id="api-call-reference">
+<h2>API Call Reference<a class="headerlink" href="#api-call-reference" title="Permalink to this headline">¶</a></h2>
+<p>We will go on to document the various API calls and their arguments here.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using feederd&#8217;s JSON API</a><ul>
+<li><a class="reference internal" href="#client-api-libraries">Client API Libraries</a></li>
+<li><a class="reference internal" href="#api-call-reference">API Call Reference</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ec2nommerd.html"
+                        title="previous chapter">ec2nommerd</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hacking.html"
+                        title="next chapter">Hacking on media-nommer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/jsonapi.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hacking.html" title="Hacking on media-nommer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="ec2nommerd"
+             >previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
