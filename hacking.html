@@ -22,8 +22,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
-    <link rel="next" title="API Reference" href="apiref/index.html" />
-    <link rel="prev" title="feederd" href="feederd.html" /> 
+    <link rel="next" title="media-nommer module reference" href="apiref/index.html" />
+    <link rel="prev" title="ec2nommerd" href="ec2nommerd.html" /> 
   </head>
   <body>
     <div class="related">
@@ -33,13 +33,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="apiref/index.html" title="API Reference"
+          <a href="apiref/index.html" title="media-nommer module reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="feederd.html" title="feederd"
+          <a href="ec2nommerd.html" title="ec2nommerd"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>
@@ -83,15 +80,22 @@ excellent <a class="reference external" href="http://help.github.com/">GitHub he
 <p>There are a few additional dependencies to install when doing development
 work. Since everyone is being good little programmers and working under
 <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>, it&#8217;s just a matter of switching to said virtual environment and
-doing:</p>
-<div class="highlight-python"><pre>pip install nose sphinx</pre>
+doing this from within your <tt class="docutils literal"><span class="pre">media-nommer</span></tt> dir:</p>
+<div class="highlight-python"><pre>pip install -r requirements.txt</pre>
 </div>
-<p>Now you&#8217;re set to run unit tests and build our documentation.</p>
+<p>Now you&#8217;re set to develop, run unit tests, and build our documentation.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>You will now want to review the <a class="reference internal" href="installation.html#installing-configuring"><em>Configuring</em></a> section of
+<a class="reference internal" href="installation.html"><em>Installation</em></a> document. You may create your <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt> in your
+<tt class="docutils literal"><span class="pre">media-nommer</span></tt> directory for convenience. Return to this document once
+you have finished following the configuration instructions.</p>
 </div>
 <div class="section" id="running-and-writing-unit-tests">
 <h2>Running and writing unit tests<a class="headerlink" href="#running-and-writing-unit-tests" title="Permalink to this headline">¶</a></h2>
-<p>Running unit tests is trivial with <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/">nose</a>. <cite>cd</cite> to your media-nommer directory
-and just run:</p>
+<p>Running unit tests is trivial with <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/">nose</a>. <strong class="command">cd</strong> to your <tt class="docutils literal"><span class="pre">media-nommer</span></tt>
+directory and just run:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">nose</span>
 </pre></div>
 </div>
@@ -115,12 +119,40 @@ is understood that writing unit tests is boring, tedious, and un-fun, but
 it is a necessary evil for complex software.</p>
 </div>
 </div>
+<div class="section" id="running-feederd-locally">
+<h2>Running feederd locally<a class="headerlink" href="#running-feederd-locally" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is suitable for local testing and development, your actual deployment
+would probably omit the <tt class="docutils literal"><span class="pre">-n</span></tt> flag to allow daemonization, unless you&#8217;re
+using something like <a class="reference external" href="http://supervisord.org/">Supervisor</a>.</p>
+</div>
+<p>If you are in your <tt class="docutils literal"><span class="pre">media-nommer</span></tt> directory, you may run <a class="reference internal" href="feederd.html"><em>feederd</em></a>
+locally by doing this:</p>
+<div class="highlight-python"><pre>PYTHONPATH=media_nommer twistd -n --pidfile=feederd.pid feederd</pre>
+</div>
+</div>
+<div class="section" id="running-ec2nommerd-locally">
+<h2>Running ec2nommerd locally<a class="headerlink" href="#running-ec2nommerd-locally" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> is designed to run on your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances, and is not at all
+meant to run on anything else. While it will do so just fine in most cases,
+a few features (such as self-termination) obviously won&#8217;t work.</p>
+<p>If you are in your <tt class="docutils literal"><span class="pre">media-nommer</span></tt> directory, you may run <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>
+locally by doing this:</p>
+<div class="highlight-python"><pre>PYTHONPATH=media_nommer twistd -n --pidfile=ec2nommerd.pid ec2nommerd -l</pre>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Make <strong>sure</strong> to include the <cite>-l</cite> flag or your daemon will just deadlock
+while trying to query a web server that is internal to <a class="reference external" href="http://aws.amazon.com/">AWS</a>.</p>
+</div>
+</div>
 <div class="section" id="code-style">
 <h2>Code style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
 <p>We mostly adhere to <a class="reference external" href="http://www.python.org/dev/peps/pep-0008/">PEP8</a>, and expect contributors to do the same. A few quick
 hi-lights:</p>
 <ul class="simple">
-<li>80 columns width max, unless absolutely necessary.</li>
+<li>80 columns width max when possible.</li>
 <li>Indents are 4 spaces, and not tabs. <strong>No tabs allowed</strong>.</li>
 <li>Avoid wildcard * imports unless absolutely necessary.</li>
 <li>No camelCase method names, use underscores and lowercase letters.</li>
@@ -161,7 +193,10 @@ your employer are OK with this before contributing.</p>
 <li><a class="reference internal" href="#">Hacking on media-nommer</a><ul>
 <li><a class="reference internal" href="#obtaining-the-source">Obtaining the source</a></li>
 <li><a class="reference internal" href="#installing-additional-dependencies">Installing additional dependencies</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
 <li><a class="reference internal" href="#running-and-writing-unit-tests">Running and writing unit tests</a></li>
+<li><a class="reference internal" href="#running-feederd-locally">Running feederd locally</a></li>
+<li><a class="reference internal" href="#running-ec2nommerd-locally">Running ec2nommerd locally</a></li>
 <li><a class="reference internal" href="#code-style">Code style</a></li>
 <li><a class="reference internal" href="#contributing-code">Contributing code</a></li>
 <li><a class="reference internal" href="#i-m-stumped-help">&#8220;I&#8217;m stumped, help!&#8221;</a></li>
@@ -171,11 +206,11 @@ your employer are OK with this before contributing.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="feederd.html"
-                        title="previous chapter">feederd</a></p>
+  <p class="topless"><a href="ec2nommerd.html"
+                        title="previous chapter">ec2nommerd</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="apiref/index.html"
-                        title="next chapter">API Reference</a></p>
+                        title="next chapter">media-nommer module reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/hacking.txt"
@@ -205,13 +240,10 @@ your employer are OK with this before contributing.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="apiref/index.html" title="API Reference"
+          <a href="apiref/index.html" title="media-nommer module reference"
              >next</a> |</li>
         <li class="right" >
-          <a href="feederd.html" title="feederd"
+          <a href="ec2nommerd.html" title="ec2nommerd"
              >previous</a> |</li>
         <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
       </ul>

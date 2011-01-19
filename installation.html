@@ -33,9 +33,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="feederd.html" title="feederd"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -58,8 +55,8 @@ issue please let us know on our <a class="reference external" href="https://gith
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The following instructions are directed at what your eventual production
-environment will need. Developers setting up a dev environment can omit
-anything that they don&#8217;t need (like daemonizing and process monitoring).</p>
+environment will need. See <a class="reference internal" href="hacking.html"><em>Hacking on media-nommer</em></a> for details on setting up
+a development environment.</p>
 </div>
 <div class="section" id="assumptions">
 <h2>Assumptions<a class="headerlink" href="#assumptions" title="Permalink to this headline">¶</a></h2>
@@ -83,13 +80,69 @@ not currently supported.</li>
 <li>Some flavor of Linux, Unix, BSD, Mac OS, or POSIX compliant OS.</li>
 <li><a class="reference external" href="http://python.org">Python</a> 2.5 or higher, <a class="reference external" href="http://python.org">Python</a> 2.6 or 2.7 recommended. <a class="reference external" href="http://python.org">Python</a> 3.x is not
 supported (yet).</li>
-<li><a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> 10.x. We develop on 10.2.</li>
-<li><a class="reference external" href="http://boto.cloudhackers.com/">Boto</a> 2.0 or higher.</li>
 </ul>
-<p>The easiest way to satisfy these is to create your <a class="reference external" href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>, switch to
-it, and run the following:</p>
-<div class="highlight-python"><pre>pip install twisted boto</pre>
 </div>
+<div class="section" id="installing">
+<h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
+<p>For the sake of clarity, the media-nommer Python package on PyPi contains
+the sources for <a class="reference internal" href="feederd.html"><em>feederd</em></a> and <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>. You will want to install
+this package on whatever machine you&#8217;d like to run <a class="reference internal" href="feederd.html"><em>feederd</em></a> on. You do
+not need to do any setup work for <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>, as those are ran on an
+<a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance that is based off of an AMI that we have created for you.</p>
+<p>The easiest way is to install the package is through <strong class="command">pip</strong> or
+<strong class="command">easy_install</strong>:</p>
+<div class="highlight-python"><pre>pip install media-nommer</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This will only work once we start distributing media-nommer on PyPi. For
+now, you&#8217;ll need to download a tarball/zip, or check the source out from
+our <a class="reference external" href="https://github.com/duointeractive/media-nommer">GitHub project</a> and install via the enclosed <tt class="docutils literal"><span class="pre">setup.py</span></tt>. See the
+<tt class="docutils literal"><span class="pre">requirements.txt</span></tt> within the project for dependencies.</p>
+</div>
+<p>You will then need to visit <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a> and sign up for the following
+services:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a></li>
+<li><a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a></li>
+<li><a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a></li>
+</ul>
+<p>Fees are based on what you actually use, so signing up for these services will
+incur no costs unless you use them.</p>
+<p>You will then want to create a <tt class="docutils literal"><span class="pre">media_nommer</span></tt> <em>Security Group</em> through the
+<a class="reference external" href="http://aws.amazon.com/">AWS</a> management console for your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances to be part of. You will also
+need to create an SSH key pair. Make sure to keep track of the name of your
+key pair, as you will need that in the configuration stage.</p>
+</div>
+<div class="section" id="configuring">
+<span id="installing-configuring"></span><h2>Configuring<a class="headerlink" href="#configuring" title="Permalink to this headline">¶</a></h2>
+<p>Once media-nommer is installed, create a directory to store a few files in.
+Within said directory, create a file called <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt>. You will
+want to add these settings values (at minimum):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># The AWS SSH key pair to use for creating instances. This is just the</span>
+<span class="c"># name of it, as per your Account Security Credentials panel on AWS.</span>
+<span class="n">EC2_KEY_NAME</span> <span class="o">=</span> <span class="s">&#39;xxxxxxxxx&#39;</span>
+<span class="c"># The AWS credentials used to access SimpleDB, SQS, and EC2.</span>
+<span class="n">AWS_ACCESS_KEY_ID</span> <span class="o">=</span> <span class="s">&#39;YYYYYYYYYYYYYYYYYYYY&#39;</span>
+<span class="n">AWS_SECRET_ACCESS_KEY</span> <span class="o">=</span> <span class="s">&#39;ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&#39;</span>
+</pre></div>
+</div>
+<p>See <tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.conf.settings</span></tt> for a full list of settings (and their
+defaults) that you may override in your <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt>.</p>
+</div>
+<div class="section" id="starting-feederd">
+<h2>Starting feederd<a class="headerlink" href="#starting-feederd" title="Permalink to this headline">¶</a></h2>
+<p>You will now want to start <a class="reference internal" href="feederd.html"><em>feederd</em></a> using whatever init script or
+init daemon you use. We have had good results with <a class="reference external" href="http://supervisord.org/">Supervisor</a>, but you can
+use whatever you&#8217;re comfortable with. Make sure that the server running
+<a class="reference internal" href="feederd.html"><em>feederd</em></a> is reachable by the machines that will be sending API requests
+to start encoding jobs.</p>
+</div>
+<div class="section" id="using">
+<h2>Using<a class="headerlink" href="#using" title="Permalink to this headline">¶</a></h2>
+<p>From here, you&#8217;ll want to select and start using a <a class="reference internal" href="index.html#client-api-libraries"><em>Client API Libraries</em></a>.
+These are what communicate with <a class="reference internal" href="feederd.html"><em>feederd</em></a>&#8216;s RESTful web API, and ultimately
+help get stuff done.</p>
 </div>
 </div>
 
@@ -104,6 +157,10 @@ it, and run the following:</p>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#assumptions">Assumptions</a></li>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#configuring">Configuring</a></li>
+<li><a class="reference internal" href="#starting-feederd">Starting feederd</a></li>
+<li><a class="reference internal" href="#using">Using</a></li>
 </ul>
 </li>
 </ul>
@@ -142,9 +199,6 @@ it, and run the following:</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="feederd.html" title="feederd"
              >next</a> |</li>
