@@ -1,0 +1,149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ec2nommerd &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
+    <link rel="next" title="Hacking on media-nommer" href="hacking.html" />
+    <link rel="prev" title="feederd" href="feederd.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hacking.html" title="Hacking on media-nommer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="feederd.html" title="feederd"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="id1">
+<h1>ec2nommerd<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>If <a class="reference internal" href="feederd.html"><em>feederd</em></a> is the manager, <tt class="docutils literal"><span class="pre">ec2nommerd</span></tt> is the worker. You can also
+think of the relationship in that <a class="reference internal" href="feederd.html"><em>feederd</em></a> feeds your nommers.</p>
+<div class="section" id="what-is-ec2nommerd">
+<h2>What is ec2nommerd<a class="headerlink" href="#what-is-ec2nommerd" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ec2nommerd</span></tt> is a <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin that runs as a daemon on <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances
+in the cloud. These instances are automatically created by <a class="reference internal" href="feederd.html"><em>feederd</em></a>.
+If an <tt class="docutils literal"><span class="pre">ec2nommerd</span></tt> finds itself with available encoding capacity, it will
+hit an Amazon <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a> queue to see if there is any work available. If it finds
+anything, it pulls the job details from <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> and hands the job off to
+the appropriate <a class="reference internal" href="#nommers"><em>nommer</em></a> for encoding.</p>
+<p>If, after a period of time, the daemon receives no work to be done, it can
+be configured to terminate itself to save money.</p>
+</div>
+<div class="section" id="nommers">
+<span id="id2"></span><h2>Nommers<a class="headerlink" href="#nommers" title="Permalink to this headline">¶</a></h2>
+<p>Nommers are classes that contain all of the logic specific to different kinds
+of encoding workflows. For example, the
+<a class="reference internal" href="apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer" title="media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer"><tt class="xref py py-mod docutils literal"><span class="pre">FFmpegNommer</span></tt></a>
+nommer wraps the <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> command for encoding. Each nommer sub-classes
+the
+<a class="reference internal" href="apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer" title="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer"><tt class="xref py py-mod docutils literal"><span class="pre">BaseNommer</span></tt></a>
+class, which provides some foundational methods. View the source for these
+two classes for examples on how they work. You may sub-class or create your
+own nommer, adding it to at least one preset in your
+<a class="reference internal" href="apiref/conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a> setting.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ec2nommerd</a><ul>
+<li><a class="reference internal" href="#what-is-ec2nommerd">What is ec2nommerd</a></li>
+<li><a class="reference internal" href="#nommers">Nommers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="feederd.html"
+                        title="previous chapter">feederd</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hacking.html"
+                        title="next chapter">Hacking on media-nommer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ec2nommerd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hacking.html" title="Hacking on media-nommer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="feederd.html" title="feederd"
+             >previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.core.storage_backends.s3 &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../../index.html" />
+    <link rel="up" title="media_nommer.core.storage_backends" href="../storage_backends.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../storage_backends.html" accesskey="U">media_nommer.core.storage_backends</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.core.storage_backends.s3</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains an S3Backend class for working with URIs that have</span>
+<span class="sd">an s3:// protocol specified.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">boto</span>
+<span class="kn">from</span> <span class="nn">boto.s3.resumable_download_handler</span> <span class="kn">import</span> <span class="n">ResumableDownloadHandler</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils.uri_parsing</span> <span class="kn">import</span> <span class="n">get_values_from_media_uri</span>
+
+<div class="viewcode-block" id="S3Backend"><a class="viewcode-back" href="../../../../apiref/core.html#media_nommer.core.storage_backends.s3.S3Backend">[docs]</a><span class="k">class</span> <span class="nc">S3Backend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstracts access to S3 via the common set of file storage backend methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_aws_s3_connection</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">access_key</span><span class="p">,</span> <span class="n">secret_access_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy-loading of the S3 boto connection. Refer to this instead of</span>
+<span class="sd">        referencing self._aws_s3_connection directly.</span>
+<span class="sd">        </span>
+<span class="sd">        :param str access_key: The AWS_ Access Key needed to get to the</span>
+<span class="sd">            file in question.</span>
+<span class="sd">        :param str secret_access_key: The AWS_ Secret Access Key needed to get </span>
+<span class="sd">            to the file in question.</span>
+<span class="sd">        :rtype: :py:class:`boto.s3.connection.Connection`</span>
+<span class="sd">        :returns: A boto connection to Amazon&#39;s S3 interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">boto</span><span class="o">.</span><span class="n">connect_s3</span><span class="p">(</span><span class="n">access_key</span><span class="p">,</span> <span class="n">secret_access_key</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="S3Backend.download_file"><a class="viewcode-back" href="../../../../apiref/core.html#media_nommer.core.storage_backends.s3.S3Backend.download_file">[docs]</a>    <span class="k">def</span> <span class="nf">download_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">fobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a URI, download the file to the given file-like object.</span>
+<span class="sd">        </span>
+<span class="sd">        :param str uri: The URI of a file to download.</span>
+<span class="sd">        :param file fobj: A file-like object to download the file to.</span>
+<span class="sd">        :rtype: file</span>
+<span class="sd">        :returns: A file handle to the downloaded file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Breaks the URI into usable componenents.</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">get_values_from_media_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_get_aws_s3_connection</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">],</span>
+                                          <span class="n">values</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">])</span>
+        <span class="n">bucket</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">get_bucket</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">])</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;S3Backend.download_file(): &quot;</span> \
+                     <span class="s">&quot;Downloading: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="n">dlhandler</span> <span class="o">=</span> <span class="n">ResumableDownloadHandler</span><span class="p">(</span><span class="n">num_retries</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">dlhandler</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fobj</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;S3Backend.download_file(): &quot;</span> \
+                     <span class="s">&quot;Download of </span><span class="si">%s</span><span class="s"> completed.&quot;</span> <span class="o">%</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fobj</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="S3Backend.upload_file"><a class="viewcode-back" href="../../../../apiref/core.html#media_nommer.core.storage_backends.s3.S3Backend.upload_file">[docs]</a>    <span class="k">def</span> <span class="nf">upload_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">fobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a file-like object, upload it to the specified URI.</span>
+<span class="sd">        </span>
+<span class="sd">        :param str uri: The URI to upload the file to.</span>
+<span class="sd">        :param file fobj: The file-like object to populate the S3 key from.</span>
+<span class="sd">        :rtype: :py:class:`boto.s3.key.Key`</span>
+<span class="sd">        :returns: The newly set boto key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Breaks the URI into usable componenents.</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">get_values_from_media_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;S3Backend.upload_file(): Received: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">values</span><span class="p">)</span>
+
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_get_aws_s3_connection</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">],</span>
+                                          <span class="n">values</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">])</span>
+        <span class="n">bucket</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">create_bucket</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">])</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="n">new_key</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;S3Backend.upload_file(): &quot;</span>\
+                     <span class="s">&quot;Settings contents of &#39;</span><span class="si">%s</span><span class="s">&#39; key from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">values</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">],</span> <span class="n">fobj</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">key</span><span class="o">.</span><span class="n">set_contents_from_filename</span><span class="p">(</span><span class="n">fobj</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;S3Backend.upload_file(): Upload complete.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">key</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../storage_backends.html" >media_nommer.core.storage_backends</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+    </div>
+  </body>
+</html>
