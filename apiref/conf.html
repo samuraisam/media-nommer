@@ -257,9 +257,50 @@ the <a class="reference internal" href="#media_nommer.conf.settings.NOMMERD_MAX_
 <dt id="media_nommer.conf.settings.PRESETS">
 <tt class="descclassname">media_nommer.conf.settings.</tt><tt class="descname">PRESETS</tt><a class="headerlink" href="#media_nommer.conf.settings.PRESETS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default: <tt class="docutils literal"><span class="pre">()</span></tt></p>
-<p>A dict of workflow presets. You must at least specify the Nommer class to
-use for each preset, but can go as far as specifying all encoding options,
-too.</p>
+<p>A dict of workflow preset dicts. You must at least specify the
+<a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> class to use for each preset, but can go as far as
+specifying defaults for all encoding options, too.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You <strong>must</strong> specify at least one preset. Each preset may only use one
+<a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a>.</p>
+</div>
+<p>This is a minimal preset:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">PRESETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;ffmpeg&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;nommer&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Depending on which <a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> you use, some may allow you
+to specify some default values to be passed to whatever software the
+<a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> employs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">PRESETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;preset_with_defaults&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;nommer&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;</span><span class="p">,</span>
+        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c"># These are passed as outfile options to ffmpeg</span>
+            <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&#39;s&#39;</span><span class="p">:</span> <span class="s">&#39;320x240&#39;</span><span class="p">,</span>
+                <span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="s">&#39;15&#39;</span><span class="p">,</span>
+                <span class="s">&#39;sameq&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s">&#39;ar&#39;</span><span class="p">:</span> <span class="s">&#39;22050&#39;</span><span class="p">,</span>
+                <span class="s">&#39;ab&#39;</span><span class="p">:</span> <span class="s">&#39;48&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>These may be over-ridden on a per-job basis. Anything in <tt class="docutils literal"><span class="pre">options</span></tt> merely
+serves as a default value.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The contents of the <tt class="docutils literal"><span class="pre">options</span></tt> dict will vary depending on which
+<a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> you use. See your nommer&#8217;s documentation for
+details on what this should look like.</p>
+</div>
 </dd></dl>
 
 <dl class="data">

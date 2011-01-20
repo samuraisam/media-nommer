@@ -128,7 +128,45 @@ conjunction with the ec2nommerd <a class="reference external" href="http://twist
 <dl class="class">
 <dt id="media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer">
 <em class="property">class </em><tt class="descclassname">media_nommer.ec2nommerd.nommers.ffmpeg.</tt><tt class="descname">FFmpegNommer</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/ffmpeg.html#FFmpegNommer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer" title="Permalink to this definition">¶</a></dt>
-<dd><p>A nommer that runs on EC2 instances, encoding media with <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a>.</p>
+<dd><p>This <a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> is used to encode media with the excellent
+<a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> utility.</p>
+<p><strong>Presets</strong></p>
+<p>Below is an example 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a>
+dict for FFmpegNommer:</p>
+<div class="highlight-python"><pre>'your_preset_name_here': {
+    'nommer': 'media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer',
+    'options': {
+        # These would be passed as infile options to ffmpeg
+        'infile_options': {
+        },
+        # These are passed as outfile options to ffmpeg
+        'outfile_options': {
+            's': '320x240',
+            # Some flags don't have values, like sameq
+            'sameq': None,
+            'ar': '22050',
+            'ab': '48',
+        }
+    }
+}</pre>
+</div>
+<p>In this case, the command created by this nommer would end up being:</p>
+<div class="highlight-python"><pre>ffmpeg -y -i &lt;infilename&gt; -s 320x240 -sameq -ar 22050 -ab 48 &lt;outfilename&gt;</pre>
+</div>
+<p>Note that the <tt class="docutils literal"><span class="pre">sameq</span></tt> key in our <tt class="docutils literal"><span class="pre">outfile_options</span></tt> dict above has a
+<tt class="xref docutils literal"><span class="pre">None</span></tt> value. You&#8217;ll need to do this for flags or options that don&#8217;t
+require a value.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Everything specified in the <tt class="docutils literal"><span class="pre">options</span></tt> dict may be overridden
+in your encoding API requests. These merely act as presets.</p>
+</div>
+<p>If you want no options by default, this is OK too:</p>
+<div class="highlight-python"><pre>'minimal_preset': {
+    'nommer': 'media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer'
+}</pre>
+</div>
 </dd></dl>
 
 </div>

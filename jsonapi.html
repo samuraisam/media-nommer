@@ -75,7 +75,69 @@ we&#8217;ll add yours to the list.</p>
 </div>
 <div class="section" id="api-call-reference">
 <h2>API Call Reference<a class="headerlink" href="#api-call-reference" title="Permalink to this headline">¶</a></h2>
-<p>We will go on to document the various API calls and their arguments here.</p>
+<p>All API calls consist of a JSON-formatted <strong>POST</strong> request sent to the
+following URLs. Responses are also JSON-formatted.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You should send these calls to the host/port that your <a class="reference internal" href="feederd.html"><em>feederd</em></a>
+is running on. This defaults to 8001, but may specify when you call the
+<strong class="command">twistd</strong> command to start the daemon.</p>
+</div>
+<div class="section" id="job-submit">
+<h3>/job/submit/<a class="headerlink" href="#job-submit" title="Permalink to this headline">¶</a></h3>
+<p>This call submits a job for encoding. Here is an example call request body:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;source_path&quot;</span><span class="p">:</span> <span class="s">&quot;s3://AWS_ID:AWS_SECRET_KEY@BUCKET/KEYNAME.mp4&quot;</span><span class="p">,</span>
+    <span class="s">&quot;dest_path&quot;</span><span class="p">:</span> <span class="s">&quot;s3://AWS_ID:AWS_SECRET_KEY@OTHER_BUCKET/KEYNAME.mp4&quot;</span><span class="p">,</span>
+    <span class="s">&quot;preset&quot;</span><span class="p">:</span> <span class="s">&quot;movie_high_q&quot;</span><span class="p">,</span>
+    <span class="s">&quot;notify_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://myapp.somewhere.com/encoding/job_done/&quot;</span><span class="p">,</span>
+    <span class="s">&quot;job_options&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;infile_options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;r&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">},</span>
+        <span class="s">&quot;outfile_options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;sameq&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s">&quot;target&quot;</span><span class="p">:</span> <span class="s">&quot;vcd&quot;</span><span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To further elaborate:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">source_path</span></tt> is a URI to the media file you&#8217;d like to encode. In this
+example, we use an S3 URI.</li>
+<li><tt class="docutils literal"><span class="pre">dest_path</span></tt> is the full URI to where the output will end up.</li>
+<li><tt class="docutils literal"><span class="pre">preset</span></tt> corresponds to a preset specified in your <tt class="docutils literal"><span class="pre">nomconf.py</span></tt>
+configuration file. See the
+<a class="reference internal" href="apiref/conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a> setting for more
+details. These are mandatory, and can optionally be used to specify default
+encoding settings for a certain kind of encoding job. You also specify
+which <a class="reference internal" href="ec2nommerd.html#nommers"><em>nommer</em></a> to use here.</li>
+<li><tt class="docutils literal"><span class="pre">notify_url</span></tt> is optional, and may be omitted entirely. If specified, this
+URL is hit with a GET request when the encoding job completes.</li>
+<li><tt class="docutils literal"><span class="pre">job_options</span></tt> is optional, and may be omitted as well. The contents of this
+depends on the <em class="xref std std-ref">nommer</em> selected in your <tt class="docutils literal"><span class="pre">preset</span></tt>.
+See your <tt class="docutils literal"><span class="pre">nomconf.py</span></tt> if you need a refresher as to which preset uses which
+nommer. For this example, we show
+<a class="reference internal" href="apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer" title="media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer"><tt class="xref py py-class docutils literal"><span class="pre">FFmpegNommer</span></tt></a>,
+which wraps the excellent <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a>. See the documentation for the various
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> to see what <tt class="docutils literal"><span class="pre">job_options</span></tt> is used for. In cases where values
+specified in your API request&#8217;s <tt class="docutils literal"><span class="pre">job_options</span></tt> conflict with the <tt class="docutils literal"><span class="pre">options</span></tt>
+in your preset, the value from the API request is used.</li>
+</ul>
+<p>The response to your request is also JSON-formatted, and looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;success&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="s">&quot;job_id&quot;</span><span class="p">:</span> <span class="s">&quot;1f40fc92da241694750979ee6cf582f2d5d7d28e1833&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If an error is encountered, <tt class="docutils literal"><span class="pre">success</span></tt> will be <tt class="docutils literal"><span class="pre">false</span></tt>, additional
+<tt class="docutils literal"><span class="pre">message</span></tt> and <tt class="docutils literal"><span class="pre">error_code</span></tt> keys will be set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;false&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+    <span class="s">&quot;error_code&quot;</span><span class="p">:</span> <span class="s">&quot;BADINPUT&quot;</span><span class="p">,</span>
+    <span class="s">&quot;message&quot;</span><span class="p">:</span> <span class="s">&quot;Bad input file. Unable to encode.&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -89,7 +151,10 @@ we&#8217;ll add yours to the list.</p>
   <ul>
 <li><a class="reference internal" href="#">Using feederd&#8217;s JSON API</a><ul>
 <li><a class="reference internal" href="#client-api-libraries">Client API Libraries</a></li>
-<li><a class="reference internal" href="#api-call-reference">API Call Reference</a></li>
+<li><a class="reference internal" href="#api-call-reference">API Call Reference</a><ul>
+<li><a class="reference internal" href="#job-submit">/job/submit/</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

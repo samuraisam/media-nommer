@@ -128,10 +128,49 @@ want to add these settings values (at minimum):</p>
 <span class="c"># The AWS credentials used to access SimpleDB, SQS, and EC2.</span>
 <span class="n">AWS_ACCESS_KEY_ID</span> <span class="o">=</span> <span class="s">&#39;YYYYYYYYYYYYYYYYYYYY&#39;</span>
 <span class="n">AWS_SECRET_ACCESS_KEY</span> <span class="o">=</span> <span class="s">&#39;ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ&#39;</span>
+
+<span class="n">PRESETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c"># A basic ffmpeg preset with no default options provided.</span>
+    <span class="s">&#39;basic_ffmpeg&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;nommer&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;</span><span class="p">,</span>
+        <span class="c"># This options dict will vary wildly depending on which</span>
+        <span class="c"># Nommer you are using. This example only holds true for</span>
+        <span class="c"># the FFmpegNommer</span>
+        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c"># These are passed as infile options to ffmpeg</span>
+            <span class="s">&#39;infile_options&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="c"># These are passed as outfile options to ffmpeg</span>
+            <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="apiref/conf.html#module-media_nommer.conf.settings" title="media_nommer.conf.settings"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.conf.settings</span></tt></a> for a full list of settings (and their
 defaults) that you may override in your <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt>.</p>
+</div>
+<div class="section" id="presets">
+<h2>Presets<a class="headerlink" href="#presets" title="Permalink to this headline">¶</a></h2>
+<p>Presets are ways to shorten and simplify your job submission API calls. They
+also make :ref:Nommers &lt;nommers&gt;` available via the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For a <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> to be available via the
+<a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>, you must specify at least a</p>
+</div>
+<p>At the very least, you&#8217;ll need to add a basic preset to for each of the
+:ref:Nommers &lt;nommers&gt;` you&#8217;d like to use. Specifying the <tt class="docutils literal"><span class="pre">options</span></tt> dict
+is completely optional.</p>
+<p>You&#8217;ll want to look at the
+<a class="reference internal" href="apiref/conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a> setting for more
+details on how this works. The documentation for the <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a>
+used in each preset determines what kind of values you can pass in the
+<tt class="docutils literal"><span class="pre">options</span></tt> dict, so make sure you look them over as well.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Values provided to the API at submission time always take priority
+over any directly conflicting default in a preset.</p>
+</div>
 </div>
 <div class="section" id="starting-feederd">
 <h2>Starting feederd<a class="headerlink" href="#starting-feederd" title="Permalink to this headline">¶</a></h2>
@@ -162,6 +201,7 @@ help get stuff done.</p>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
 <li><a class="reference internal" href="#installing">Installing</a></li>
 <li><a class="reference internal" href="#configuring">Configuring</a></li>
+<li><a class="reference internal" href="#presets">Presets</a></li>
 <li><a class="reference internal" href="#starting-feederd">Starting feederd</a></li>
 <li><a class="reference internal" href="#using">Using</a></li>
 </ul>
