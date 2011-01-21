@@ -75,8 +75,8 @@ we&#8217;ll add yours to the list.</p>
 </div>
 <div class="section" id="api-call-reference">
 <h2>API Call Reference<a class="headerlink" href="#api-call-reference" title="Permalink to this headline">¶</a></h2>
-<p>All API calls consist of a JSON-formatted <strong>POST</strong> request sent to the
-following URLs. Responses are also JSON-formatted.</p>
+<p>All API calls are sent via <strong>POST</strong>, and have keys that may either be straight
+string values or JSON. Responses are also JSON-formatted.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">You should send these calls to the host/port that your <a class="reference internal" href="feederd.html"><em>feederd</em></a>
@@ -85,18 +85,16 @@ is running on. This defaults to 8001, but may specify when you call the
 </div>
 <div class="section" id="job-submit">
 <h3>/job/submit/<a class="headerlink" href="#job-submit" title="Permalink to this headline">¶</a></h3>
-<p>This call submits a job for encoding. Here is an example call request body:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;source_path&quot;</span><span class="p">:</span> <span class="s">&quot;s3://AWS_ID:AWS_SECRET_KEY@BUCKET/KEYNAME.mp4&quot;</span><span class="p">,</span>
-    <span class="s">&quot;dest_path&quot;</span><span class="p">:</span> <span class="s">&quot;s3://AWS_ID:AWS_SECRET_KEY@OTHER_BUCKET/KEYNAME.mp4&quot;</span><span class="p">,</span>
-    <span class="s">&quot;preset&quot;</span><span class="p">:</span> <span class="s">&quot;movie_high_q&quot;</span><span class="p">,</span>
-    <span class="s">&quot;notify_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://myapp.somewhere.com/encoding/job_done/&quot;</span><span class="p">,</span>
-    <span class="s">&quot;job_options&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&quot;infile_options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;r&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">},</span>
-        <span class="s">&quot;outfile_options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;sameq&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span> <span class="s">&quot;target&quot;</span><span class="p">:</span> <span class="s">&quot;vcd&quot;</span><span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
+<p>This call submits a job for encoding. Here is an example call with POST
+keys and their values:</p>
+<div class="highlight-python"><pre>source_path = s3://AWS_ID:AWS_SECRET_KEY@BUCKET/KEYNAME.mp4
+dest_path = s3://AWS_ID:AWS_SECRET_KEY@OTHER_BUCKET/KEYNAME.mp4
+preset = movie_high_q
+notify_url = http://myapp.somewhere.com/encoding/job_done/
+job_options = {
+    "infile_options": {"r": 24},
+    "outfile_options": {"sameq": null, "target": "vcd"}
+}</pre>
 </div>
 <p>To further elaborate:</p>
 <ul class="simple">
@@ -111,8 +109,9 @@ encoding settings for a certain kind of encoding job. You also specify
 which <a class="reference internal" href="ec2nommerd.html#nommers"><em>nommer</em></a> to use here.</li>
 <li><tt class="docutils literal"><span class="pre">notify_url</span></tt> is optional, and may be omitted entirely. If specified, this
 URL is hit with a GET request when the encoding job completes.</li>
-<li><tt class="docutils literal"><span class="pre">job_options</span></tt> is optional, and may be omitted as well. The contents of this
-depends on the <em class="xref std std-ref">nommer</em> selected in your <tt class="docutils literal"><span class="pre">preset</span></tt>.
+<li><tt class="docutils literal"><span class="pre">job_options</span></tt> is an optional key that contains a JSON-serialized dict, and
+may be omitted as well. The contents of this depends on the
+<em class="xref std std-ref">nommer</em> selected in your <tt class="docutils literal"><span class="pre">preset</span></tt>.
 See your <tt class="docutils literal"><span class="pre">nomconf.py</span></tt> if you need a refresher as to which preset uses which
 nommer. For this example, we show
 <a class="reference internal" href="apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer" title="media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer"><tt class="xref py py-class docutils literal"><span class="pre">FFmpegNommer</span></tt></a>,
