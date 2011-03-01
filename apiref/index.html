@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Reference &mdash; media-nommer v1.0dev documentation</title>
+    <title>media-nommer module reference &mdash; media-nommer v1.0dev documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="media-nommer v1.0dev documentation" href="../index.html" />
-    <link rel="next" title="media_nommer.feederd" href="feederd.html" />
+    <link rel="next" title="media_nommer.conf" href="conf.html" />
     <link rel="prev" title="Hacking on media-nommer" href="../hacking.html" /> 
   </head>
   <body>
@@ -33,7 +33,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="feederd.html" title="media_nommer.feederd"
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conf.html" title="media_nommer.conf"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../hacking.html" title="Hacking on media-nommer"
@@ -47,14 +50,41 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="api-reference">
-<span id="apiref-index"></span><h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="media-nommer-module-reference">
+<span id="apiref-index"></span><h1>media-nommer module reference<a class="headerlink" href="#media-nommer-module-reference" title="Permalink to this headline">¶</a></h1>
+<p>The following pages are reference material for media-nommer itself. This is
+probably only interesting to you if you are adding new Nommers. If you simply
+want to get to encoding, you&#8217;ll want to select and start using one of
+the <a class="reference internal" href="../jsonapi.html#client-api-libraries"><em>Client API Libraries</em></a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="conf.html">media_nommer.conf</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="conf.html#module-media_nommer.conf.settings">settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conf.html#module-media_nommer.conf.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">media_nommer.core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core.html#module-media_nommer.core.storage_backends">storage_backends</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core.html#id1">s3</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#module-media_nommer.core.job_state_backend">job_state_backend</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ec2nommerd.html">media_nommer.ec2nommerd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ec2nommerd.html#module-media_nommer.ec2nommerd.nommers">nommers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ec2nommerd.html#module-media_nommer.ec2nommerd.nommers.base_nommer">base_nommer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ec2nommerd.html#id1">ffmpeg</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ec2nommerd.html#module-media_nommer.ec2nommerd.interval_tasks">interval_tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ec2nommerd.html#module-media_nommer.ec2nommerd.node_state">node_state</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="feederd.html">media_nommer.feederd</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="feederd.html#feederd">feederd</a></li>
-<li class="toctree-l2"><a class="reference internal" href="feederd.html#feederd-conf">feederd.conf</a></li>
-<li class="toctree-l2"><a class="reference internal" href="feederd.html#feederd-web">feederd.web</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#module-media_nommer.feederd.ec2_instance_manager">ec2_instance_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#module-media_nommer.feederd.interval_tasks">interval_tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#module-media_nommer.feederd.job_cache">job_cache</a></li>
 </ul>
 </li>
 </ul>
@@ -71,8 +101,8 @@
   <p class="topless"><a href="../hacking.html"
                         title="previous chapter">Hacking on media-nommer</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="feederd.html"
-                        title="next chapter">media_nommer.feederd</a></p>
+  <p class="topless"><a href="conf.html"
+                        title="next chapter">media_nommer.conf</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/apiref/index.txt"
@@ -102,7 +132,10 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="feederd.html" title="media_nommer.feederd"
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="conf.html" title="media_nommer.conf"
              >next</a> |</li>
         <li class="right" >
           <a href="../hacking.html" title="Hacking on media-nommer"
@@ -112,7 +145,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2010, DUO Interactive, LLC.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.ec2nommerd.interval_tasks &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.ec2nommerd.interval_tasks</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains tasks that are executed at intervals, and is imported at</span>
+<span class="sd">the time the server is started. The intervals at which the tasks run</span>
+<span class="sd">are configurable via :py:mod:`media_nommer.conf.settings`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">media_nommer.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">media_nommer.core.job_state_backend</span> <span class="kn">import</span> <span class="n">JobStateBackend</span>
+<span class="kn">from</span> <span class="nn">media_nommer.ec2nommerd.node_state</span> <span class="kn">import</span> <span class="n">NodeStateManager</span>
+
+<div class="viewcode-block" id="threaded_encode_job"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.interval_tasks.threaded_encode_job">[docs]</a><span class="k">def</span> <span class="nf">threaded_encode_job</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a job, run it through its encoding workflow in a non-blocking manner.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Update the timestamp for when the node last did something so it</span>
+    <span class="c"># won&#39;t terminate itself.</span>
+    <span class="n">NodeStateManager</span><span class="o">.</span><span class="n">i_did_something</span><span class="p">()</span>
+    <span class="n">job</span><span class="o">.</span><span class="n">nommer</span><span class="o">.</span><span class="n">onomnom</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="task_check_for_new_jobs"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.interval_tasks.task_check_for_new_jobs">[docs]</a><span class="k">def</span> <span class="nf">task_check_for_new_jobs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Looks at the number of currently active threads and compares it against the </span>
+<span class="sd">    :py:data:`MAX_ENCODING_JOBS_PER_EC2_INSTANCE &lt;media_nommer.conf.settings.MAX_ENCODING_JOBS_PER_EC2_INSTANCE&gt;` </span>
+<span class="sd">    setting. If we are under the max, fire up another thread for encoding </span>
+<span class="sd">    additional job(s). </span>
+<span class="sd">    </span>
+<span class="sd">    The interval at which :doc:`../ec2nommerd` checks for new jobs is </span>
+<span class="sd">    determined by the </span>
+<span class="sd">    :py:data:`NOMMERD_NEW_JOB_CHECK_INTERVAL &lt;media_nommer.conf.settings.NOMMERD_NEW_JOB_CHECK_INTERVAL&gt;`</span>
+<span class="sd">    setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_active_threads</span> <span class="o">=</span> <span class="n">NodeStateManager</span><span class="o">.</span><span class="n">get_num_active_threads</span><span class="p">()</span>
+    <span class="n">max_threads</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MAX_ENCODING_JOBS_PER_EC2_INSTANCE</span>
+    <span class="n">num_jobs_to_pop</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_threads</span> <span class="o">-</span> <span class="n">num_active_threads</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">num_jobs_to_pop</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c"># We have more room for encoding threads, determine how many.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;task_check_for_new_jobs: &quot;</span> \
+                     <span class="s">&quot;Popping up to </span><span class="si">%d</span><span class="s"> new jobs.&quot;</span> <span class="o">%</span> <span class="n">num_jobs_to_pop</span><span class="p">)</span>
+        <span class="c"># This is an iterable of BaseEncodingJob sub-classed instances for</span>
+        <span class="c"># each job returned from the queue.</span>
+        <span class="n">jobs</span> <span class="o">=</span> <span class="n">JobStateBackend</span><span class="o">.</span><span class="n">pop_new_jobs_from_queue</span><span class="p">(</span><span class="n">num_jobs_to_pop</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jobs</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;* Popped </span><span class="si">%d</span><span class="s"> jobs from the queue.&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">jobs</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+            <span class="c"># For each job returned, render in another thread.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;* Starting encoder thread for job: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">job</span><span class="o">.</span><span class="n">unique_id</span><span class="p">)</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">callInThread</span><span class="p">(</span><span class="n">threaded_encode_job</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="threaded_heartbeat"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat">[docs]</a><span class="k">def</span> <span class="nf">threaded_heartbeat</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fires off a threaded task to check in with feederd via SimpleDB_. There</span>
+<span class="sd">    is a domain that contains all of the running EC2_ instances and their</span>
+<span class="sd">    unique IDs, along with some state data.</span>
+<span class="sd">    </span>
+<span class="sd">    The interval at which heartbeats occur is determined by the</span>
+<span class="sd">    :py:data:`NOMMERD_HEARTBEAT_INTERVAL &lt;media_nommer.conf.settings.NOMMERD_HEARTBEAT_INTERVAL` </span>
+<span class="sd">    setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">NOMMERD_TERMINATE_WHEN_IDLE</span><span class="p">:</span>
+        <span class="c"># thread_count_mod factors out this thread when counting active threads.</span>
+        <span class="n">is_terminated</span> <span class="o">=</span> <span class="n">NodeStateManager</span><span class="o">.</span><span class="n">contemplate_termination</span><span class="p">(</span><span class="n">thread_count_mod</span><span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">is_terminated</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_terminated</span><span class="p">:</span>
+        <span class="n">NodeStateManager</span><span class="o">.</span><span class="n">send_instance_state_update</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="task_heartbeat"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.interval_tasks.task_heartbeat">[docs]</a><span class="k">def</span> <span class="nf">task_heartbeat</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks in with feederd in a non-blocking manner via </span>
+<span class="sd">    :py:meth:`threaded_heartbeat`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callInThread</span><span class="p">(</span><span class="n">threaded_heartbeat</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="register_tasks"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.interval_tasks.register_tasks">[docs]</a><span class="k">def</span> <span class="nf">register_tasks</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers all tasks. Called by the :doc:`../ec2nommerd` Twisted_ plugin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="n">task_check_for_new_jobs</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                                        <span class="n">settings</span><span class="o">.</span><span class="n">NOMMERD_NEW_JOB_CHECK_INTERVAL</span><span class="p">,</span>
+                                        <span class="n">now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="n">task_heartbeat</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">NOMMERD_HEARTBEAT_INTERVAL</span><span class="p">,</span>
+                                           <span class="n">now</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

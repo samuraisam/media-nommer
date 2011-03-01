@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.ec2nommerd.node_state &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.ec2nommerd.node_state</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains the :py:class:`NodeStateManager` class, which is an abstraction layer</span>
+<span class="sd">for storing and communicating the status of EC2_ nodes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">boto</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">media_nommer.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils.compat</span> <span class="kn">import</span> <span class="n">total_seconds</span>
+
+<div class="viewcode-block" id="NodeStateManager"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager">[docs]</a><span class="k">class</span> <span class="nc">NodeStateManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tracks this node&#39;s state, reports it to :doc:`../feederd`, and terminates </span>
+<span class="sd">    itself if certain conditions of inactivity are met.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">last_dtime_i_did_something</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+    <span class="c"># Used for lazy-loading the SDB connection. Do not refer to directly.</span>
+    <span class="n">__aws_sdb_connection</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># Used for lazy-loading the SDB domain. Do not refer to directly.</span>
+    <span class="n">__aws_sdb_nommer_state_domain</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># Used for lazy-loading the EC2 connection. Do not refer to directly.</span>
+    <span class="n">__aws_ec2_connection</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># Store the instance ID for this EC2 node (if not local).</span>
+    <span class="n">__instance_id</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_aws_ec2_connection</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy-loading of the EC2 boto connection. Refer to this instead of</span>
+<span class="sd">        referencing cls.__aws_ec2_connection directly.</span>
+<span class="sd">        </span>
+<span class="sd">        :returns: A boto connection to Amazon&#39;s EC2 interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_ec2_connection</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__aws_ec2_connection</span> <span class="o">=</span> <span class="n">boto</span><span class="o">.</span><span class="n">connect_ec2</span><span class="p">(</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">AWS_ACCESS_KEY_ID</span><span class="p">,</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">AWS_SECRET_ACCESS_KEY</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_ec2_connection</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_aws_sdb_connection</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy-loading of the SimpleDB boto connection. Refer to this instead of</span>
+<span class="sd">        referencing cls.__aws_sdb_connection directly.</span>
+<span class="sd">        </span>
+<span class="sd">        :returns: A boto connection to Amazon&#39;s SimpleDB interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_connection</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_connection</span> <span class="o">=</span> <span class="n">boto</span><span class="o">.</span><span class="n">connect_sdb</span><span class="p">(</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">AWS_ACCESS_KEY_ID</span><span class="p">,</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">AWS_SECRET_ACCESS_KEY</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_connection</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_aws_sdb_nommer_state_domain</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lazy-loading of the SimpleDB boto domain. Refer to this instead of</span>
+<span class="sd">        referencing cls.__aws_sdb_nommer_state_domain directly.</span>
+
+<span class="sd">        :returns: A boto SimpleDB domain for this workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_nommer_state_domain</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_nommer_state_domain</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_aws_sdb_connection</span><span class="p">()</span><span class="o">.</span><span class="n">create_domain</span><span class="p">(</span>
+                                    <span class="n">settings</span><span class="o">.</span><span class="n">SIMPLEDB_EC2_NOMMER_STATE_DOMAIN</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__aws_sdb_nommer_state_domain</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.get_instance_id"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.get_instance_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_instance_id</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">is_local</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine this EC2 instance&#39;s unique instance ID. Lazy load this, and</span>
+<span class="sd">        avoid further re-queries after the first one.</span>
+<span class="sd">               </span>
+<span class="sd">        :param bool is_local: When True, don&#39;t try to hit EC2&#39;s meta data server,</span>
+<span class="sd">            When False, just make up a unique ID.</span>
+<span class="sd">            </span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        :returns: The EC2 instance&#39;s ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">__instance_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_local</span><span class="p">:</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">__instance_id</span> <span class="o">=</span> <span class="s">&#39;local-dev&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aws_meta_url</span> <span class="o">=</span> <span class="s">&#39;http://169.254.169.254/latest/meta-data/instance-id&#39;</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">aws_meta_url</span><span class="p">)</span>
+                <span class="n">cls</span><span class="o">.</span><span class="n">__instance_id</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__instance_id</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.is_ec2_instance"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.is_ec2_instance">[docs]</a>    <span class="k">def</span> <span class="nf">is_ec2_instance</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine whether this is an EC2 instance or not.</span>
+<span class="sd">        </span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        :returns: ``True`` if this is an EC2 instance, ``False`` if otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_instance_id</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&#39;local-dev&#39;</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.send_instance_state_update"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.send_instance_state_update">[docs]</a>    <span class="k">def</span> <span class="nf">send_instance_state_update</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;ACTIVE&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a status update to feederd through SimpleDB. Lets the daemon</span>
+<span class="sd">        know how many jobs this instance is crunching right now. Also updates</span>
+<span class="sd">        a timestamp field to let feederd know how long it has been since the</span>
+<span class="sd">        instance&#39;s last check-in.</span>
+<span class="sd">        </span>
+<span class="sd">        :keyword str state: If this EC2_ instance is anything but ``ACTIVE``,</span>
+<span class="sd">            pass the state here. This is useful during node termination.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">is_ec2_instance</span><span class="p">():</span>
+            <span class="n">instance_id</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_instance_id</span><span class="p">()</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_aws_sdb_nommer_state_domain</span><span class="p">()</span><span class="o">.</span><span class="n">new_item</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+            <span class="n">item</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance_id</span>
+            <span class="n">item</span><span class="p">[</span><span class="s">&#39;active_jobs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_num_active_threads</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">item</span><span class="p">[</span><span class="s">&#39;last_report_dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">item</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.contemplate_termination"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.contemplate_termination">[docs]</a>    <span class="k">def</span> <span class="nf">contemplate_termination</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">thread_count_mod</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Looks at how long it&#39;s been since this worker has done something, and</span>
+<span class="sd">        decides whether to self-terminate.</span>
+<span class="sd">        </span>
+<span class="sd">        :param int thread_count_mod: Add this to the amount returned by the call</span>
+<span class="sd">            to :py:meth:`get_num_active_threads`. This is useful when calling</span>
+<span class="sd">            this method from a non-encoder thread.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        :returns: ``True`` if this instance terminated itself, ``False``</span>
+<span class="sd">            if not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">is_ec2_instance</span><span class="p">():</span>
+            <span class="c"># Developing locally, don&#39;t go here.</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c"># This is -1 since this is also a thread doing the contemplation.</span>
+        <span class="c"># This would always be 1, even if we had no jobs encoding, if we</span>
+        <span class="c"># didn&#39;t take into account this thread.</span>
+        <span class="n">num_active_threads</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_num_active_threads</span><span class="p">()</span> <span class="o">+</span> <span class="n">thread_count_mod</span>
+
+        <span class="k">if</span> <span class="n">num_active_threads</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c"># Encoding right now, don&#39;t terminate.</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="n">tdelt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">cls</span><span class="o">.</span><span class="n">last_dtime_i_did_something</span>
+        <span class="c"># Total seconds of inactivity.</span>
+        <span class="n">inactive_secs</span> <span class="o">=</span> <span class="n">total_seconds</span><span class="p">(</span><span class="n">tdelt</span><span class="p">)</span>
+
+        <span class="c"># If we&#39;re over the inactivity threshold...</span>
+        <span class="k">if</span> <span class="n">inactive_secs</span> <span class="o">&gt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">NOMMERD_MAX_INACTIVITY</span><span class="p">:</span>
+            <span class="n">instance_id</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_instance_id</span><span class="p">()</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_aws_ec2_connection</span><span class="p">()</span>
+            <span class="c"># Find this particular EC2 instance via boto.</span>
+            <span class="n">reservations</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">get_all_instances</span><span class="p">(</span><span class="n">instance_ids</span><span class="o">=</span><span class="p">[</span><span class="n">instance_id</span><span class="p">])</span>
+            <span class="c"># This should only be one match, but in the interest of</span>
+            <span class="c"># playing along...</span>
+            <span class="k">for</span> <span class="n">reservation</span> <span class="ow">in</span> <span class="n">reservations</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">reservation</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+                    <span class="c"># Here&#39;s the instance, terminate it.</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Goodbye, cruel world.&quot;</span><span class="p">)</span>
+                    <span class="n">cls</span><span class="o">.</span><span class="n">send_instance_state_update</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="s">&#39;TERMINATED&#39;</span><span class="p">)</span>
+                    <span class="n">instance</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="c"># Seeya later!</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="c"># Continue existence, no termination.</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.get_num_active_threads"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.get_num_active_threads">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_active_threads</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the reactor&#39;s threadpool to see how many threads are currently</span>
+<span class="sd">        working. This can be used to determine how busy this node is.</span>
+<span class="sd">        </span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        :returns: The number of active threads.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">reactor</span><span class="o">.</span><span class="n">getThreadPool</span><span class="p">()</span><span class="o">.</span><span class="n">working</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="NodeStateManager.i_did_something"><a class="viewcode-back" href="../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.node_state.NodeStateManager.i_did_something">[docs]</a>    <span class="k">def</span> <span class="nf">i_did_something</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pat ourselves on the back each time we do something.</span>
+<span class="sd">        </span>
+<span class="sd">        Used for determining whether this node&#39;s continued existence is</span>
+<span class="sd">        necessary anymore in :py:meth:`contemplate_termination`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">last_dtime_i_did_something</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

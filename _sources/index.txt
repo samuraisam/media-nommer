@@ -6,27 +6,35 @@
 media-nommer: A Python-based media encoder system
 =================================================
 
-media-nommer is an encoding system that is able to utilize a number of
-different encoding methods and services via the aptly named Nommer system.
-The software is powered by a combination of Python_, Twisted_, and Boto_.
+media-nommer is a distributed media encoding system that gets its horsepower
+from `Amazon AWS`_. This leaves you with a cheaper, more reliable alternative
+to some commercial paid encoding systems, since you are only paying for your
+`Amazon AWS`_ usage. The software is powered by a combination of Python_, 
+Twisted_, and Boto_, and is licensed under the flexible `BSD License`_.
 
-For example, if you wanted to do all of your encoding on your own with EC2_
-and FFmpeg_, you'd use the EC2FFmpegNommer to encode your media files. Or perhaps
-you want to encode your smaller media with FFmpeg_, but ship some of your
-larger files off to encoding.com, you could use the up-coming 
-EncodingDotComNommer in addition to the aforementioned EC2FFmpegNommer to
-create a mixed workflow.
+This may be useful if...
+------------------------
 
-Regardless of how you nom your media, this Python_ module will abstract away
-the boring stuff, leaving you to create your media for the masses to consume
-(nom?).
+media-nommer is of interest to you if you need a way to encode media in a 
+cheap, fast, and scalable manner. By using `Amazon AWS`_'s excellent EC2_
+service, you can automatically scale your number of encoder instances up to
+meet your demands. Of course, the entire process may be configured, limited,
+and adapted to meet your needs. Some example usage cases where media-nommer
+might be a good fit:
 
-**Project Status:** Early development
+* Encoding user-uploaded media for serving from your site
+* Bulk encoding large collections of videos
+
+Learning more
+-------------
+
+To learn more about media-nommer, see the :doc:`introduction`.
+
+**Project Status:** Alpha
 
 **License:** media-nommer is licensed under the `BSD License`_.
 
-Useful Links
-------------
+These links may also be useful to you.
 
 * Source repository: https://github.com/duointeractive/media-nommer
 * Issue tracker: https://github.com/duointeractive/media-nommer/issues
@@ -40,14 +48,19 @@ Documentation
    introduction
    installation
    feederd
-   hacking
-   
-Reference
----------
+   ec2nommerd
+   jsonapi
+
+Development docs
+----------------
+
+The following topics will be useful to you if you would like to help improve
+media-nommer.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
+   hacking
    apiref/index
 
 Indices and tables

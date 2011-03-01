@@ -1,0 +1,181 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.ec2nommerd.nommers.base_nommer &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.ec2nommerd.nommers.base_nommer</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes in this module serve as a basis for Nommers. This should be thought</span>
+<span class="sd">of as a protocol or a foundation to assist in maintaining a consistent API</span>
+<span class="sd">between Nommers.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">media_nommer.ec2nommerd.node_state</span> <span class="kn">import</span> <span class="n">NodeStateManager</span>
+<span class="kn">from</span> <span class="nn">media_nommer.core.storage_backends</span> <span class="kn">import</span> <span class="n">get_backend_for_uri</span>
+
+<div class="viewcode-block" id="BaseNommer"><a class="viewcode-back" href="../../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer">[docs]</a><span class="k">class</span> <span class="nc">BaseNommer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a base class that can be sub-classed by each Nommer to serve</span>
+<span class="sd">    as a foundation. Required methods raise a NotImplementedError exception</span>
+<span class="sd">    by default, unless overridden by child classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job</span> <span class="o">=</span> <span class="n">job</span>
+
+<div class="viewcode-block" id="BaseNommer.onomnom"><a class="viewcode-back" href="../../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.onomnom">[docs]</a>    <span class="k">def</span> <span class="nf">onomnom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start nomming. If you&#39;re going to override this, make sure to follow</span>
+<span class="sd">        the same basic job state updating flow if possible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_encoding</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">_start_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call your encoder here, do work. Make sure to update job state as</span>
+<span class="sd">        it progresses, if you can.</span>
+<span class="sd">        </span>
+<span class="sd">        Needs to set one of the two job states: FINISHED, ERROR</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<div class="viewcode-block" id="BaseNommer.wrapped_set_job_state"><a class="viewcode-back" href="../../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.wrapped_set_job_state">[docs]</a>    <span class="k">def</span> <span class="nf">wrapped_set_job_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps set_job_state() to perform extra actions before and/or after</span>
+<span class="sd">        job state updates.</span>
+<span class="sd">        </span>
+<span class="sd">        :param str new_state: The job state to set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Tracks the fact that we did something, prevents the node from</span>
+        <span class="c"># terminating itself.</span>
+        <span class="n">NodeStateManager</span><span class="o">.</span><span class="n">i_did_something</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">set_job_state</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BaseNommer.download_source_file"><a class="viewcode-back" href="../../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.download_source_file">[docs]</a>    <span class="k">def</span> <span class="nf">download_source_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Download the source file to a temporary file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_set_job_state</span><span class="p">(</span><span class="s">&#39;DOWNLOADING&#39;</span><span class="p">)</span>
+
+        <span class="c"># This is the remote path.</span>
+        <span class="n">file_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">source_path</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;BaseNommer.download_source_file(): &quot;</span> \
+                     <span class="s">&quot;Attempting to download </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">file_uri</span><span class="p">)</span>
+        <span class="c"># Figure out which backend to use for the protocol in the URI.</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">get_backend_for_uri</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span>
+        <span class="c"># Create a temporary file which will be auto deleted when</span>
+        <span class="c"># garbage collected.</span>
+        <span class="n">fobj</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s">&#39;w+b&#39;</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c"># Using the correct backend, download the file to the given</span>
+        <span class="c"># file-like object.</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">file_uri</span><span class="p">,</span> <span class="n">fobj</span><span class="p">)</span>
+        <span class="c"># flush and fsync to force writing to the file object. Doesn&#39;t always</span>
+        <span class="c"># happen otherwise.</span>
+        <span class="n">fobj</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">fsync</span><span class="p">(</span><span class="n">fobj</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;BaseNommer.download_source_file(): &quot;</span> \
+                     <span class="s">&quot;Downloaded </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_uri</span><span class="p">,</span> <span class="n">fobj</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="c"># As soon as this fobj is garbage collected, it is closed(). Be</span>
+        <span class="c"># careful to continue its existence if you need it.</span>
+        <span class="k">return</span> <span class="n">fobj</span>
+</div>
+<div class="viewcode-block" id="BaseNommer.upload_to_destination"><a class="viewcode-back" href="../../../../apiref/ec2nommerd.html#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.upload_to_destination">[docs]</a>    <span class="k">def</span> <span class="nf">upload_to_destination</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fobj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Upload the output file to the destination specified by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_set_job_state</span><span class="p">(</span><span class="s">&#39;UPLOADING&#39;</span><span class="p">)</span>
+
+        <span class="n">file_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">dest_path</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;BaseNommer.upload_to_destination(): &quot;</span> \
+                     <span class="s">&quot;Attempting to upload </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fobj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">file_uri</span><span class="p">))</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="n">get_backend_for_uri</span><span class="p">(</span><span class="n">file_uri</span><span class="p">)</span>
+        <span class="n">storage</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">file_uri</span><span class="p">,</span> <span class="n">fobj</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;BaseNommer.upload_to_destination(): &quot;</span> \
+                     <span class="s">&quot;Finished uploading </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fobj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">file_uri</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

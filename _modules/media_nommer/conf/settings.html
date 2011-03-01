@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.conf.settings &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../index.html" />
+    <link rel="up" title="media_nommer.conf" href="../conf.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../conf.html" accesskey="U">media_nommer.conf</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.conf.settings</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains default global settings. When </span>
+<span class="sd">:doc:`../ec2nommerd` and :doc:`../feederd` daemons are started,  </span>
+<span class="sd">:py:func:`media_nommer.conf.update_settings_from_module` takes the settings</span>
+<span class="sd">that the user explicitly set and overrides these defaults.</span>
+
+<span class="sd">You may override any of these global defaults in your ``nomconf.py`` file.</span>
+<span class="sd">You will need to at the least provide the following settings:</span>
+
+<span class="sd">* :py:data:`AWS_ACCESS_KEY_ID`</span>
+<span class="sd">* :py:data:`AWS_SECRET_ACCESS_KEY`</span>
+<span class="sd">* :py:data:`EC2_KEY_NAME`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">######################</span>
+<span class="c">#General AWS settings</span>
+<span class="c">######################</span>
+
+<span class="n">AWS_ACCESS_KEY_ID</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="sd">&quot;&quot;&quot;Default: ``None`` **(User must provide)**</span>
+
+<span class="sd">These AWS_ credentials are used for job state management via SimpleDB_, and</span>
+<span class="sd">queueing with SQS_.&quot;&quot;&quot;</span>
+<span class="n">AWS_SECRET_ACCESS_KEY</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="sd">&quot;&quot;&quot;Default: ``None`` **(User must provide)**</span>
+
+<span class="sd">These AWS_ credentials are used for job state management via SimpleDB_, and</span>
+<span class="sd">queueing with SQS_.&quot;&quot;&quot;</span>
+
+<span class="n">CONFIG_S3_BUCKET</span> <span class="o">=</span> <span class="s">&#39;nommer_config&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;nommer_config&#39;``</span>
+
+<span class="sd">The S3_ bucket to store a copy of ``nomconf.py`` for nommer instances.&quot;&quot;&quot;</span>
+
+<span class="n">SQS_NEW_JOB_QUEUE_NAME</span> <span class="o">=</span> <span class="s">&#39;media_nommer&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;media_nommer&#39;``</span>
+
+<span class="sd">The SQS_ queue used to notify :doc:`../ec2nommerd` of new jobs.&quot;&quot;&quot;</span>
+<span class="n">SQS_JOB_STATE_CHANGE_QUEUE_NAME</span> <span class="o">=</span> <span class="s">&#39;media_nommer_jstate&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;media_nommer_jstate&#39;``</span>
+
+<span class="sd">The SQS_ queue used to notify :doc:`../feederd` of changes in job state.</span>
+<span class="sd">For example, when a job goes from ``PENDING`` to ``DOWNLOADING`` or </span>
+<span class="sd">``ENCODING``.&quot;&quot;&quot;</span>
+
+<span class="n">SIMPLEDB_JOB_STATE_DOMAIN</span> <span class="o">=</span> <span class="s">&#39;media_nommer&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;media_nommer&#39;``</span>
+
+<span class="sd">The SimpleDB_ domain name for storing encoding job state in. For example,</span>
+<span class="sd">the date the job was created, the current state of the job (``PENDING``,</span>
+<span class="sd">``ENCODING``, ``FINISHED``, etc.), and the Nommer being used to do the</span>
+<span class="sd">encoding.&quot;&quot;&quot;</span>
+<span class="n">SIMPLEDB_EC2_NOMMER_STATE_DOMAIN</span> <span class="o">=</span> <span class="s">&#39;media_nommer_ec2nommer_state&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;media_nommer_ec2nommer_state&#39;``</span>
+
+<span class="sd">The SimpleDB_ domain for storing heartbeat information from the</span>
+<span class="sd">EC2_ encoder instances.&quot;&quot;&quot;</span>
+
+<span class="c">###############################</span>
+<span class="c"># Intelligent scaling settings</span>
+<span class="c">###############################</span>
+
+<span class="n">MAX_ENCODING_JOBS_PER_EC2_INSTANCE</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="sd">&quot;&quot;&quot;Default: ``1``</span>
+
+<span class="sd">The maximum number of jobs that should ever run on a single EC2_ instance at</span>
+<span class="sd">the same time.&quot;&quot;&quot;</span>
+<span class="n">MAX_NUM_EC2_INSTANCES</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="sd">&quot;&quot;&quot;Default: ``3``</span>
+
+<span class="sd">The maximum number of EC2 instances to run at a time.&quot;&quot;&quot;</span>
+<span class="n">JOB_OVERFLOW_THRESH</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="sd">&quot;&quot;&quot;Default: ``2``</span>
+
+<span class="sd">If the number of unfinished jobs exceeds our capacity </span>
+<span class="sd">(:py:data:`MAX_ENCODING_JOBS_PER_EC2_INSTANCE` * </span>
+<span class="sd">``&lt;Number of Active EC2 instances&gt;``) by this number of jobs, look at starting </span>
+<span class="sd">new instances if we have not already exceeded </span>
+<span class="sd">:py:data:`MAX_NUM_EC2_INSTANCES`.&quot;&quot;&quot;</span>
+
+<span class="c">########################</span>
+<span class="c"># EC2 instance settings</span>
+<span class="c">########################</span>
+
+<span class="n">EC2_KEY_NAME</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="sd">&quot;&quot;&quot;Default: ``None`` **(User must provide)**</span>
+
+<span class="sd">The AWS_ SSH key name with which to launch the EC2_ instances.&quot;&quot;&quot;</span>
+<span class="n">EC2_SECURITY_GROUPS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;media_nommer&#39;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Default: ``[&#39;media_nommer&#39;]``</span>
+
+<span class="sd">The AWS_ security groups to create EC2_ instances under.&quot;&quot;&quot;</span>
+<span class="n">EC2_AMI_ID</span> <span class="o">=</span> <span class="s">&#39;ami-847c8ded&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;ami-847c8ded&#39;``</span>
+
+<span class="sd">The AMI ID for the media-nommer EC2_ instance.&quot;&quot;&quot;</span>
+<span class="n">EC2_INSTANCE_TYPE</span> <span class="o">=</span> <span class="s">&#39;m1.large&#39;</span>
+<span class="sd">&quot;&quot;&quot;Default: ``&#39;m1.large&#39;``</span>
+
+<span class="sd">The type of instance to run on. Must be at least ``m1.large``. ``t1.micro`` </span>
+<span class="sd">and ``t1.small`` instances are *NOT* supported by the default AMI.&quot;&quot;&quot;</span>
+
+<span class="c">###################</span>
+<span class="c"># nommerd settings</span>
+<span class="c">###################</span>
+
+<span class="n">NOMMERD_TERMINATE_WHEN_IDLE</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="sd">&quot;&quot;&quot;Default: ``True``</span>
+
+<span class="sd">When ``True``, allow the termination of idle EC2_ instances based on </span>
+<span class="sd">the :py:data:`NOMMERD_MAX_INACTIVITY` setting.&quot;&quot;&quot;</span>
+<span class="n">NOMMERD_MAX_INACTIVITY</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">5</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60 * 5``</span>
+
+<span class="sd">How many seconds of inactivity (not working on any jobs) before an</span>
+<span class="sd">instance will terminate itself.&quot;&quot;&quot;</span>
+<span class="n">NOMMERD_HEARTBEAT_INTERVAL</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60``</span>
+
+<span class="sd">Used by EC2_ nodes to determine how long to wait between sending a status </span>
+<span class="sd">update via SimpleDB_. The node will also check for inactivity greater than the </span>
+<span class="sd">configured value in :py:data:`NOMMERD_MAX_INACTIVITY`, and terminate itself if </span>
+<span class="sd">inactivity has exceeded that value, and :py:data:`NOMMERD_TERMINATE_WHEN_IDLE` </span>
+<span class="sd">is ``True``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">NOMMERD_NEW_JOB_CHECK_INTERVAL</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60``</span>
+
+<span class="sd">An interval (in seconds) to wait between calls to AWS_ to check for new </span>
+<span class="sd">jobs.&quot;&quot;&quot;</span>
+
+<span class="c">###################</span>
+<span class="c"># feederd settings</span>
+<span class="c">###################</span>
+
+<span class="n">FEEDERD_JOB_STATE_CHANGE_CHECK_INTERVAL</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60``</span>
+
+<span class="sd">How often :doc:`../feederd` will check for job state changes.&quot;&quot;&quot;</span>
+<span class="n">FEEDERD_PRUNE_JOBS_INTERVAL</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">5</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60 * 5``</span>
+
+<span class="sd">How often :doc:`../feederd` will check for abandoned or expired jobs.&quot;&quot;&quot;</span>
+<span class="n">FEEDERD_ALLOW_EC2_LAUNCHES</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="sd">&quot;&quot;&quot;Default: ``True``</span>
+
+<span class="sd">When ``True``, allow the launching of new EC2_ encoder instances.&quot;&quot;&quot;</span>
+<span class="n">FEEDERD_ABANDON_INACTIVE_JOBS_THRESH</span> <span class="o">=</span> <span class="mi">3600</span> <span class="o">*</span> <span class="mi">24</span>
+<span class="sd">&quot;&quot;&quot;Default: ``3600 * 24``</span>
+
+<span class="sd">If a job sticks in an un-finished state after this long (in seconds), it</span>
+<span class="sd">is considered abandoned, and :doc:`../feederd` will kill discard it.&quot;&quot;&quot;</span>
+<span class="n">FEEDERD_AUTO_SCALE_INTERVAL</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="sd">&quot;&quot;&quot;Default: ``60``</span>
+
+<span class="sd">How often :doc:`../feederd` should see if it needs to spawn additional</span>
+<span class="sd">EC2_ instances.&quot;&quot;&quot;</span>
+
+<span class="c">##################</span>
+<span class="c">#General settings</span>
+<span class="c">##################</span>
+
+<span class="n">STORAGE_BACKENDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;s3&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.core.storage_backends.s3.S3Backend&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;Default: (All included storage backends)</span>
+
+<span class="sd">Storage backends. The protocol is the key, the value is the backend class </span>
+<span class="sd">used to work with said protocol.&quot;&quot;&quot;</span>
+
+<span class="n">PRESETS</span> <span class="o">=</span> <span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;Default: ``()``</span>
+
+<span class="sd">A dict of workflow presets.&quot;&quot;&quot;</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../conf.html" >media_nommer.conf</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

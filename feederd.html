@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
-    <link rel="next" title="Hacking on media-nommer" href="hacking.html" />
+    <link rel="next" title="ec2nommerd" href="ec2nommerd.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
   </head>
   <body>
@@ -33,7 +33,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="hacking.html" title="Hacking on media-nommer"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="ec2nommerd"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Installation"
@@ -49,193 +52,68 @@
             
   <div class="section" id="id1">
 <h1>feederd<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
-<p><cite>feederd</cite> is a <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> daemon that orchestrates encoding workflows that involve
-monitoring a filesystem, FTP, S3, or other protocols for new files needing
-encoding. It does no encoding itself, but watches for incoming media, and uses
-our underlying nommer API to launch the encoding jobs.</p>
-<div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">Usage of <cite>feederd</cite> is entirely optional. It is an easy way to get
-drag-and-drop encoding going, but you may also use the underlying APIs
-directly in your own applications.</p>
+<p>Distributed encoding is a complex task, with lots of moving parts and
+components. To create, monitor, and &#8220;motivate&#8221; our <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> encoding instances
+during the process, we have <tt class="docutils literal"><span class="pre">feederd</span></tt>.</p>
+<div class="section" id="what-is-feederd">
+<h2>What is feederd<a class="headerlink" href="#what-is-feederd" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">feederd</span></tt> is a <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin that runs as a daemon on the machine of your
+choice. This can be on your own bare metal server, or on an <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance.
+The daemon keeps track of encoding jobs through Amazon <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>, tells
+your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> encoder instances to get to work via Amazon <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a>, and exposes a
+lightweight JSON web API for your own custom applications to schedule and
+manage jobs through.</p>
 </div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>If you followed the <a class="reference internal" href="installation.html"><em>Installation</em></a> instructions for media-nommer, you
-already have all of the needed dependencies installed. You now need to get
-your <cite>feederd</cite> daemon up and running.</p>
-<div class="section" id="nomconf-py">
-<h3>nomconf.py<a class="headerlink" href="#nomconf-py" title="Permalink to this headline">¶</a></h3>
-<p>The biggest trouble spot in setup and installation follows, so pay special
-attention to this part. <cite>feederd</cite> looks for a configuration file for its
-settings. <strong>This file must be in your Python path</strong>. Please take a moment
-to consider how this will fit into your choice of init system.</p>
-<p>We&#8217;ll go into more detail in the next section about how the startup process
-works, but for now, you need to know that you should do something like this
-to create a Python module with a  <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt> file in it:</p>
-<div class="highlight-python"><pre>cd &lt;LOCATION OF YOUR CHOICE&gt;
-mkdir media_nom
-cd media_nom
-touch __init__.py nomconf.py</pre>
+<div class="section" id="relationship-with-ec2nommerd">
+<h2>Relationship with ec2nommerd<a class="headerlink" href="#relationship-with-ec2nommerd" title="Permalink to this headline">¶</a></h2>
+<p>If <tt class="docutils literal"><span class="pre">feederd</span></tt> is the brains of the operation, <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> is the
+brawn. <tt class="docutils literal"><span class="pre">feederd</span></tt> simply saves job state data to <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> and creates
+<a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a> queue entries to let your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances know that there&#8217;s work to
+be done. Each of your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances run an <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> daemon, which
+pulls jobs from the queue (or terminates the instance if there isn&#8217;t any
+work to be done).</p>
 </div>
-<div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">You don&#8217;t want to create a directory called <tt class="file docutils literal"><span class="pre">media_nommer</span></tt>, as this
-would clash with media-nommer package name (media_nommer). We suggest
-using the <tt class="file docutils literal"><span class="pre">media_nom</span></tt> example above.</p>
+<div class="section" id="intelligent-scaling">
+<h2>Intelligent scaling<a class="headerlink" href="#intelligent-scaling" title="Permalink to this headline">¶</a></h2>
+<p>Along with providing an entry point to start, manage, and track the encoding
+process, <tt class="docutils literal"><span class="pre">feederd</span></tt> also handles scaling your encoding cloud up as needed.
+Based on your configuration, <tt class="docutils literal"><span class="pre">feederd</span></tt> will look at the current list of
+jobs that need to be encoded in comparison to the number of encoding instances
+you currently have running on <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a>. It will then decide whether it should
+spawn additional instances to handle the load.</p>
+<p><a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances are spawned from a public AMI that we maintain as part of the
+project. If you wish to create your own custom AMI, you may easily specify
+your own or clone and modify ours.</p>
+<p>Automated scaling is an optional feature, and can be configured and
+restricted in a number of different ways. For example, perhaps you don&#8217;t want
+any more than one or two <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances running at any given time.</p>
 </div>
-<p>This should leave you with a valid Python package beneath the directory of
-your choice. Make sure to note the full path of this package using the
-<strong class="command">pwd</strong> command. It will be important for starting the daemon.</p>
-<p>Next, open up <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt> in the editor of your choice, and copy/paste
-the following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># The following AWS credentials are used for accessing SQS and SimpleDB.</span>
-<span class="c"># For media source and destinations, other S3 accounts may be used.</span>
-<span class="n">AWS_ACCESS_KEY_ID</span> <span class="o">=</span> <span class="s">&#39;XXXXXXXXXXXXXXXXXXXX&#39;</span>
-<span class="n">AWS_SECRET_ACCESS_KEY</span> <span class="o">=</span> <span class="s">&#39;YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY&#39;</span>
-
-<span class="c"># The SQS queue to use for storing encoding state info.</span>
-<span class="n">SQS_QUEUE_NAME</span> <span class="o">=</span> <span class="s">&#39;media_nommer&#39;</span>
-
-<span class="c"># The SimpleDB domain name for storing encoding job state in.</span>
-<span class="n">SIMPLEDB_DOMAIN_NAME</span> <span class="o">=</span> <span class="s">&#39;media_nommer&#39;</span>
-
-<span class="c"># Example configuration for a basic EC2+FFmpeg workflow.</span>
-<span class="n">BASIC_S3_WORKFLOW</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="c"># FQPN for the Nommer class.</span>
-    <span class="s">&#39;NOMMER&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.nommers.ec2_ffmpeg.EC2FFmpegNommer&#39;</span><span class="p">,</span>
-    <span class="c"># Unique identifier for this workflow.</span>
-    <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="s">&#39;basic_s3_workflow&#39;</span><span class="p">,</span>
-    <span class="c"># A description for some UI elements and commands.</span>
-    <span class="s">&#39;DESCRIPTION&#39;</span><span class="p">:</span> <span class="s">&#39;An example workflow&#39;</span><span class="p">,</span>
-    <span class="c"># The S3 bucket to monitor for incoming media files to encode.</span>
-    <span class="s">&#39;MEDIA_SOURCE&#39;</span><span class="p">:</span> <span class="s">&#39;s3://YOUR_AWS_KEY_ID:YOUR_AWS_SECRET_KEY@nommer_in&#39;</span><span class="p">,</span>
-    <span class="c"># The bucket to place encoded files in.</span>
-    <span class="s">&#39;MEDIA_DESTINATION&#39;</span><span class="p">:</span> <span class="s">&#39;s3://YOUR_AWS_KEY_ID:YOUR_AWS_SECRET_KEY@nommer_out&#39;</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="c"># A tuple with all of your workflow dicts in it. One feederd process can</span>
-<span class="c"># manage multiple workflows at the same time.</span>
-<span class="n">WORKFLOWS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">BASIC_S3_WORKFLOW</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
+<div class="section" id="json-api">
+<h2>JSON API<a class="headerlink" href="#json-api" title="Permalink to this headline">¶</a></h2>
+<p>To actually get jobs scheduled and work done, you will need to communicate
+with <tt class="docutils literal"><span class="pre">feederd</span></tt> through its <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>.</p>
 </div>
-<p>See the <a class="reference internal" href="#feederd-settings"><em>Settings</em></a> section for a full run-down of all possible
-settings.</p>
-<div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">This <tt class="file docutils literal"><span class="pre">nomcomf.py</span></tt> file can be imported and used if you&#8217;re going
-to write anything that uses any of the APIs in media-nommer directly.</p>
-</div>
-</div>
-<div class="section" id="starting-the-daemon">
-<h3>Starting the daemon<a class="headerlink" href="#starting-the-daemon" title="Permalink to this headline">¶</a></h3>
-<p>Since <cite>feederd</cite> is just a <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin, we run it via the <strong class="command">twistd</strong>
-command. Before you begin, take a moment to review some of the possible
-options:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">twistd</span> <span class="o">--</span><span class="n">help</span>
-</pre></div>
-</div>
-<p>You&#8217;ll see that there are a number of options that allow you to set logging,
-uid/gid, and daemonization settings. Everything shown in this help display is
-part of <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a>, no media-nommer.</p>
-<p>The next step is to review the options presented by our <cite>feederd</cite> <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a>
-plugin:</p>
-<div class="highlight-python"><pre>twistd feederd --help</pre>
-</div>
-<p>Notice that we have a <cite>&#8211;config</cite> option. This defaults to the <cite>nomconf</cite> module
-we created earlier, but can be anything you&#8217;d like. Note that this is in
-Python module name format, so don&#8217;t include the &#8216;<cite>.py</cite>&#8216; extension if you&#8217;re
-going to over-ride the default.</p>
-<p>Now for the fun part, let&#8217;s start up <cite>feederd</cite>:</p>
-<div class="highlight-python"><pre>twistd -n feederd</pre>
-</div>
-<p>The <cite>-n</cite> flag starts <cite>feederd</cite> in &#8216;nodaemon&#8217; mode, which means you can stop
-it using <tt class="kbd docutils literal"><span class="pre">Control-c</span></tt> or <tt class="kbd docutils literal"><span class="pre">Control-d</span></tt> instead of having to
-<strong class="command">kill</strong> it. This is useful for testing, and some init systems like
-<a class="reference external" href="http://supervisord.org/">Supervisor</a>.</p>
-<p>If you weren&#8217;t greeted with a successful startup, you are most likely running
-into the Python path issues we hinted at earlier. If you start the daemon
-from within the directory that <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt> resides in, you should see
-a successful startup. If you need to be able to start the daemon from another
-directory that puts our our previously created <tt class="file docutils literal"><span class="pre">media_nom</span></tt> module outside
-of our Python path, we can add it explicitly:</p>
-<div class="highlight-python"><pre>PYTHONPATH=/home/youruser/media_nom twistd -n feederd</pre>
-</div>
-<p>Some init systems, such as <a class="reference external" href="http://supervisord.org/">Supervisor</a>, have facilities that allow you to change
-current working directories, which will have the same affect.</p>
-</div>
-</div>
-<div class="section" id="settings">
-<span id="feederd-settings"></span><h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
-<p>The following directives may be included in your <tt class="file docutils literal"><span class="pre">nomconf.py</span></tt> (or
-whatever custom name you chose).</p>
-<div class="section" id="aws-access-key-id">
-<h3>AWS_ACCESS_KEY_ID<a class="headerlink" href="#aws-access-key-id" title="Permalink to this headline">¶</a></h3>
-<p>The AWS id for the account that will queue encoding jobs in <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>, and
-track job state in <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>.</p>
-</div>
-<div class="section" id="aws-secret-access-key">
-<h3>AWS_SECRET_ACCESS_KEY<a class="headerlink" href="#aws-secret-access-key" title="Permalink to this headline">¶</a></h3>
-<p>The AWS key for the account that will queue encoding jobs in <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>, and
-track job state in <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>.</p>
-</div>
-<div class="section" id="sqs-queue-name">
-<h3>SQS_QUEUE_NAME<a class="headerlink" href="#sqs-queue-name" title="Permalink to this headline">¶</a></h3>
-<p>The <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a> queue used to schedule encoding jobs with.</p>
-</div>
-<div class="section" id="simpledb-domain-name">
-<h3>SIMPLEDB_DOMAIN_NAME<a class="headerlink" href="#simpledb-domain-name" title="Permalink to this headline">¶</a></h3>
-<p>The <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> domain name for storing encoding job state in.</p>
-</div>
-<div class="section" id="workflows">
-<h3>WORKFLOWS<a class="headerlink" href="#workflows" title="Permalink to this headline">¶</a></h3>
-<p>Default: <tt class="docutils literal"><span class="pre">()</span></tt> (Empty tuple)</p>
-<p>A tuple of workflow dictionaries. Each dict represents one media encoding
-workflow. A single <cite>feederd</cite> daemon can service multiple workflows, at the
-cost of potentially longer delays in some operations.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">WORKFLOWS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="p">{</span>
-        <span class="s">&#39;NOMMER&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.nommers.ec2_ffmpeg.EC2FFmpegNommer&#39;</span><span class="p">,</span>
-        <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="s">&#39;basic_s3_workflow&#39;</span><span class="p">,</span>
-        <span class="s">&#39;MEDIA_SOURCE&#39;</span><span class="p">:</span> <span class="s">&#39;s3://YOUR_AWS_KEY_ID:YOUR_AWS_SECRET_KEY@nommer_in&#39;</span><span class="p">,</span>
-        <span class="s">&#39;MEDIA_DESTINATION&#39;</span><span class="p">:</span> <span class="s">&#39;s3://YOUR_AWS_KEY_ID:YOUR_AWS_SECRET_KEY@nommer_out&#39;</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>All of the workflow settings are documented below.</p>
-<div class="section" id="nommer">
-<h4>NOMMER<a class="headerlink" href="#nommer" title="Permalink to this headline">¶</a></h4>
-<p>FQPN of the Nommer class. The current choices are:</p>
+<div class="section" id="architectural-notes">
+<h2>Architectural notes<a class="headerlink" href="#architectural-notes" title="Permalink to this headline">¶</a></h2>
+<p>One of the requirements for media-nommer was that at no time would <tt class="docutils literal"><span class="pre">feederd</span></tt>
+and one of its <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> instances communicate directly. As noted
+earlier, job state information is saved and retrieved from <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> by
+both <tt class="docutils literal"><span class="pre">feederd</span></tt> and <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> instances. <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a> is used to delegate
+work to the <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> instances. This does a few things for us:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">'media_nommer.nommers.ec2_ffmpeg.EC2FFmpegNommer'</span></tt></li>
+<li>We don&#8217;t have to open a hole in our firewall in your data center or in your
+EC2 encoder nodes.</li>
+<li>If <tt class="docutils literal"><span class="pre">feederd</span></tt> or the server that hosts it goes down, your <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>
+instances will continue encoding until the last job is popped off the queue.
+After that, they may be configured to terminate themselves after a period
+of inactivity (to save you money).</li>
 </ul>
-<p>Each of these handles encoding differently, sometimes drastically so.</p>
-</div>
-<div class="section" id="name">
-<h4>NAME<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h4>
-<p>Unique identifier for this workflow. This is used for identification in
-log files, and querying of jobs in <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> and <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a>.</p>
-</div>
-<div class="section" id="media-source">
-<span id="feederd-settings-media-source"></span><h4>MEDIA_SOURCE<a class="headerlink" href="#media-source" title="Permalink to this headline">¶</a></h4>
-<p>For workflows that monitor a location somewhere for files to encode, this is
-the URI of said location to monitor. Here are some example values:</p>
-<ul class="simple">
-<li><tt class="docutils literal"><span class="pre">'s3://AWS_KEY_ID:AWS_SECRET_KEY&#64;nommer_in'</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">'ftp://someuser&#64;somehost:/some/loc'</span></tt> <em>(Not implemented yet)</em></li>
-<li><tt class="docutils literal"><span class="pre">'file://path/to/some/dir'</span></tt> <em>(Not implemented yet)</em></li>
-</ul>
-</div>
-<div class="section" id="media-destination">
-<h4>MEDIA_DESTINATION<a class="headerlink" href="#media-destination" title="Permalink to this headline">¶</a></h4>
-<p>The final location for encoded media (along with the master file from which
-the encodings were made) should end up. This follows the same format as
-<a class="reference internal" href="#feederd-settings-media-source"><em>MEDIA_SOURCE</em></a>.</p>
-</div>
-</div>
+<p>There is a lot of code that <tt class="docutils literal"><span class="pre">feederd</span></tt> and <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> shares, which can
+all be found in the <a class="reference internal" href="apiref/core.html#module-media_nommer.core" title="media_nommer.core"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.core</span></tt></a> module. This is best thought
+of as a lower level API that these two components use to save and retrieve
+job state information.</p>
+<p>Source for <tt class="docutils literal"><span class="pre">feederd</span></tt> can be found in the <a class="reference internal" href="apiref/feederd.html#module-media_nommer.feederd" title="media_nommer.feederd"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.feederd</span></tt></a>
+module.</p>
 </div>
 </div>
 
@@ -248,25 +126,11 @@ the encodings were made) should end up. This follows the same format as
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">feederd</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a><ul>
-<li><a class="reference internal" href="#nomconf-py">nomconf.py</a></li>
-<li><a class="reference internal" href="#starting-the-daemon">Starting the daemon</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#settings">Settings</a><ul>
-<li><a class="reference internal" href="#aws-access-key-id">AWS_ACCESS_KEY_ID</a></li>
-<li><a class="reference internal" href="#aws-secret-access-key">AWS_SECRET_ACCESS_KEY</a></li>
-<li><a class="reference internal" href="#sqs-queue-name">SQS_QUEUE_NAME</a></li>
-<li><a class="reference internal" href="#simpledb-domain-name">SIMPLEDB_DOMAIN_NAME</a></li>
-<li><a class="reference internal" href="#workflows">WORKFLOWS</a><ul>
-<li><a class="reference internal" href="#nommer">NOMMER</a></li>
-<li><a class="reference internal" href="#name">NAME</a></li>
-<li><a class="reference internal" href="#media-source">MEDIA_SOURCE</a></li>
-<li><a class="reference internal" href="#media-destination">MEDIA_DESTINATION</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#what-is-feederd">What is feederd</a></li>
+<li><a class="reference internal" href="#relationship-with-ec2nommerd">Relationship with ec2nommerd</a></li>
+<li><a class="reference internal" href="#intelligent-scaling">Intelligent scaling</a></li>
+<li><a class="reference internal" href="#json-api">JSON API</a></li>
+<li><a class="reference internal" href="#architectural-notes">Architectural notes</a></li>
 </ul>
 </li>
 </ul>
@@ -275,8 +139,8 @@ the encodings were made) should end up. This follows the same format as
   <p class="topless"><a href="installation.html"
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="hacking.html"
-                        title="next chapter">Hacking on media-nommer</a></p>
+  <p class="topless"><a href="ec2nommerd.html"
+                        title="next chapter">ec2nommerd</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/feederd.txt"
@@ -306,7 +170,10 @@ the encodings were made) should end up. This follows the same format as
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="hacking.html" title="Hacking on media-nommer"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="ec2nommerd"
              >next</a> |</li>
         <li class="right" >
           <a href="installation.html" title="Installation"
@@ -316,7 +183,7 @@ the encodings were made) should end up. This follows the same format as
     </div>
     <div class="footer">
         &copy; Copyright 2010, DUO Interactive, LLC.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
