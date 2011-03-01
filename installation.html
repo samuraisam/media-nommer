@@ -173,12 +173,20 @@ defaults) that you may override in your <tt class="file docutils literal"><span 
 also make <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> available via the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">For a <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> to be available via the
-<a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>, you must specify at least a</p>
+<p class="last">Encoding jobs are submitted through the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>
+by specifying a preset to use, instead of referring to a
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> directly. If you want to make a
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> available through the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>,
+you will need a preset key containing a dict with a
+<tt class="docutils literal"><span class="pre">nommer</span></tt> key pointing to the nommer&#8217;s class (as in the example in the
+<em>Configuring</em> section).</p>
 </div>
 <p>At the very least, you&#8217;ll need to add a basic preset to for each of the
-:ref:Nommers &lt;nommers&gt;` you&#8217;d like to use. Specifying the <tt class="docutils literal"><span class="pre">options</span></tt> dict
-is completely optional.</p>
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> you&#8217;d like to use. Specifying the <tt class="docutils literal"><span class="pre">options</span></tt> dict
+is completely optional, and may be overridden in your API request. Also keep
+in mind that the <tt class="docutils literal"><span class="pre">options</span></tt> dict may differ, depending on the
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> you&#8217;re using (see the
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> docs for more details).</p>
 <p>You&#8217;ll want to look at the
 <a class="reference internal" href="apiref/conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a> setting for more
 details on how this works. The documentation for the <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a>
