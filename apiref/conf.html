@@ -126,7 +126,7 @@ queueing with <a class="reference external" href="http://aws.amazon.com/sqs/">SQ
 <dl class="data">
 <dt id="media_nommer.conf.settings.EC2_AMI_ID">
 <tt class="descclassname">media_nommer.conf.settings.</tt><tt class="descname">EC2_AMI_ID</tt><a class="headerlink" href="#media_nommer.conf.settings.EC2_AMI_ID" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default: <tt class="docutils literal"><span class="pre">'ami-847c8ded'</span></tt></p>
+<dd><p>Default: <tt class="docutils literal"><span class="pre">'ami-3eb64457'</span></tt></p>
 <p>The AMI ID for the media-nommer <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance.</p>
 </dd></dl>
 
@@ -203,7 +203,7 @@ new instances if we have not already exceeded
 <dl class="data">
 <dt id="media_nommer.conf.settings.MAX_ENCODING_JOBS_PER_EC2_INSTANCE">
 <tt class="descclassname">media_nommer.conf.settings.</tt><tt class="descname">MAX_ENCODING_JOBS_PER_EC2_INSTANCE</tt><a class="headerlink" href="#media_nommer.conf.settings.MAX_ENCODING_JOBS_PER_EC2_INSTANCE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default: <tt class="docutils literal"><span class="pre">1</span></tt></p>
+<dd><p>Default: <tt class="docutils literal"><span class="pre">2</span></tt></p>
 <p>The maximum number of jobs that should ever run on a single <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance at
 the same time.</p>
 </dd></dl>
@@ -229,7 +229,7 @@ is <tt class="xref docutils literal"><span class="pre">True</span></tt>.</p>
 <dl class="data">
 <dt id="media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY">
 <tt class="descclassname">media_nommer.conf.settings.</tt><tt class="descname">NOMMERD_MAX_INACTIVITY</tt><a class="headerlink" href="#media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default: <tt class="docutils literal"><span class="pre">60</span> <span class="pre">*</span> <span class="pre">5</span></tt></p>
+<dd><p>Default: <tt class="docutils literal"><span class="pre">60</span> <span class="pre">*</span> <span class="pre">50</span></tt></p>
 <p>How many seconds of inactivity (not working on any jobs) before an
 instance will terminate itself.</p>
 </dd></dl>
@@ -247,7 +247,10 @@ jobs.</p>
 <tt class="descclassname">media_nommer.conf.settings.</tt><tt class="descname">NOMMERD_TERMINATE_WHEN_IDLE</tt><a class="headerlink" href="#media_nommer.conf.settings.NOMMERD_TERMINATE_WHEN_IDLE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default: <tt class="xref docutils literal"><span class="pre">True</span></tt></p>
 <p>When <tt class="xref docutils literal"><span class="pre">True</span></tt>, allow the termination of idle <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances based on
-the <a class="reference internal" href="#media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY" title="media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY"><tt class="xref py py-data docutils literal"><span class="pre">NOMMERD_MAX_INACTIVITY</span></tt></a> setting.</p>
+the <a class="reference internal" href="#media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY" title="media_nommer.conf.settings.NOMMERD_MAX_INACTIVITY"><tt class="xref py py-data docutils literal"><span class="pre">NOMMERD_MAX_INACTIVITY</span></tt></a> setting. It is important to keep in
+mind that you pay for an entire hour when you start an EC2 instance, so
+setting this timeout to anything below 45 minutes is probably a waste
+of money. This timeout is in seconds.</p>
 </dd></dl>
 
 <dl class="data">
