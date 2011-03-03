@@ -80,13 +80,9 @@ with serving said protocol.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>protocol</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; A protocol string like &#8216;http&#8217;, &#8216;ftp&#8217;, or &#8216;s3&#8217;.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>protocol</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; A protocol string like &#8216;http&#8217;, &#8216;ftp&#8217;, or &#8216;s3&#8217;.</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A storage backend for the specified protocol.</p>
-</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A storage backend for the specified protocol.</td>
 </tr>
 </tbody>
 </table>
@@ -101,16 +97,11 @@ capable of interacting with the protocol seen in the URI.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>uri</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The URI to find the appropriate storage backend for.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>uri</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The URI to find the appropriate storage backend for.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><tt class="docutils literal"><span class="pre">StorageBackend</span></tt></p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">StorageBackend</span></tt></td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A reference to the backend class to use with this URI.</p>
-</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A reference to the backend class to use with this URI.</td>
 </tr>
 </tbody>
 </table>
@@ -316,10 +307,7 @@ won&#8217;t do anything else with them. This is a list of strings.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>unique_id</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; An <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>&#8216;s unique ID.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unique_id</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; An <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>&#8216;s unique ID.</td>
 </tr>
 </tbody>
 </table>
@@ -356,17 +344,12 @@ the methods higher on the call stack that use this method.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>num_to_pop</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Pop up to this many jobs from the queue at once.
-This can be up to 10, as per <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> limitations.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_to_pop</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Pop up to this many jobs from the queue at once.
+This can be up to 10, as per <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> limitations.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list</p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a> objects.</p>
-</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A list of <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a> objects.</td>
 </tr>
 </tbody>
 </table>
@@ -386,17 +369,12 @@ the methods higher on the call stack that use this method.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>num_to_pop</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Pop up to this many jobs from the queue at once.
-This can be up to 10, as per <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> limitations.</li>
-</ul>
-</td>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_to_pop</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Pop up to this many jobs from the queue at once.
+This can be up to 10, as per <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> limitations.</td>
 </tr>
-<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">list</p>
-</td>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
-<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A list of <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a> objects.</p>
-</td>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A list of <a class="reference internal" href="#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a> objects.</td>
 </tr>
 </tbody>
 </table>
@@ -491,7 +469,7 @@ used to store and communicate job state data.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, DUO Interactive, LLC.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

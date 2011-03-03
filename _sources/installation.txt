@@ -39,37 +39,60 @@ Requirements
 Installing
 ----------
 
-For the sake of clarity, the media-nommer Python package on PyPi contains
+For the sake of clarity, the media-nommer Python package contains
 the sources for :doc:`feederd` and :doc:`ec2nommerd`. You will want to install
 this package on whatever machine you'd like to run :doc:`feederd` on. You do
 not need to do any setup work for :doc:`ec2nommerd`, as those are ran on an
 EC2_ instance that is based off of an AMI that we have created for you.
 
-The easiest way is to install the package is through :command:`pip` or
-:command:`easy_install`::
+Since we are not yet distributing media-nommer on PyPi, the easiest way is to 
+install the package is through :command:`pip`::
 
-    pip install media-nommer
+    pip install txrestapi twisted
+    pip install --upgrade git+http://github.com/duointeractive/media-nommer.git#egg=media_nommer
     
 .. note::
-    This will only work once we start distributing media-nommer on PyPi. For
-    now, you'll need to download a tarball/zip, or check the source out from
-    our `GitHub project`_ and install via the enclosed ``setup.py``. See the
-    ``requirements.txt`` within the project for dependencies.
-    
-You will then need to visit `Amazon AWS`_ and sign up for the following
-services:
+    If you don't have access to :command:`pip`, you may download a tarball/zip, 
+    from our `GitHub project`_ and install via the enclosed ``setup.py``. See 
+    the ``requirements.txt`` within the project for dependencies.
+
+We have to install Twisted before media-nommer because of an odd behavior
+with :command:`pip`. 
+
+.. tip:: Any time that you upgrade or re-install Twisted, you must also 
+    re-install media-nommer.
+
+Signing up for AWS
+------------------
+
+After you have installed the media-nommer Python package on your machine(s),
+you'll need to visit `Amazon AWS`_ and sign up for the following services:
 
 * SimpleDB_
 * SQS_
 * EC2_
 
-Fees are based on what you actually use, so signing up for these services will
-incur no costs unless you use them.
+It is important to understand that even if you already have an Amazon account,
+you need to sign up to each of these services specifically for your account to
+have access to said services. This is a very quick process, and typically
+involves looking over an agreement and accepting it.
 
-You will then want to create a ``media_nommer`` *Security Group* through the 
-AWS_ management console for your EC2_ instances to be part of. You will also
-need to create an SSH key pair. Make sure to keep track of the name of your
-key pair, as you will need that in the configuration stage.
+.. tip:: Signing up for these services is outside the scope of this document. 
+    Please contact AWS_ support with questions regarding this step. Their
+    community forums are also a great resource.
+
+Fees are based on what you actually use, so signing up for these services will
+incur no costs unless you use them. 
+
+You will need to create a ``media_nommer`` EC2 *Security Group* through the 
+AWS_ management console for your EC2_ instances to be part of. 
+
+.. warning:: Failure to create an EC2 security group will result in
+    media-nommer not being able to spawn EC2 instances, which means
+    no encoding for you.
+
+You will also need to create an SSH key pair. Make sure to keep track of the 
+name of your key pair, as you will need this in the configuration stage.
     
 .. _installing_configuring:
     
@@ -112,14 +135,22 @@ Presets
 -------
 
 Presets are ways to shorten and simplify your job submission API calls. They
-also make :ref:Nommers <nommers>` available via the :doc:`JSON API <jsonapi>`.
+also make :ref:`Nommers <nommers>` available via the :doc:`JSON API <jsonapi>`.
 
-.. note:: For a :ref:`Nommer <nommers>` to be available via the 
-    :doc:`JSON API <jsonapi>`, you must specify at least a 
+.. note:: Encoding jobs are submitted through the :doc:`JSON API <jsonapi>`
+    by specifying a preset to use, instead of referring to a 
+    :ref:`Nommer <nommers>` directly. If you want to make a 
+    :ref:`Nommer <nommers>` available through the :doc:`JSON API <jsonapi>`, 
+    you will need a preset key containing a dict with a
+    ``nommer`` key pointing to the nommer's class (as in the example in the
+    *Configuring* section).  
 
 At the very least, you'll need to add a basic preset to for each of the
-:ref:Nommers <nommers>` you'd like to use. Specifying the ``options`` dict
-is completely optional.
+:ref:`Nommers <nommers>` you'd like to use. Specifying the ``options`` dict
+is completely optional, and may be overridden in your API request. Also keep
+in mind that the ``options`` dict may differ, depending on the
+:ref:`Nommers <nommers>` you're using (see the 
+:ref:`Nommer <nommers>` docs for more details).
 
 You'll want to look at the
 :py:data:`PRESETS <media_nommer.conf.settings.PRESETS>` setting for more

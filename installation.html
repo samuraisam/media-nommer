@@ -87,35 +87,61 @@ supported (yet).</li>
 </div>
 <div class="section" id="installing">
 <h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
-<p>For the sake of clarity, the media-nommer Python package on PyPi contains
+<p>For the sake of clarity, the media-nommer Python package contains
 the sources for <a class="reference internal" href="feederd.html"><em>feederd</em></a> and <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>. You will want to install
 this package on whatever machine you&#8217;d like to run <a class="reference internal" href="feederd.html"><em>feederd</em></a> on. You do
 not need to do any setup work for <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>, as those are ran on an
 <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance that is based off of an AMI that we have created for you.</p>
-<p>The easiest way is to install the package is through <strong class="command">pip</strong> or
-<strong class="command">easy_install</strong>:</p>
-<div class="highlight-python"><pre>pip install media-nommer</pre>
+<p>Since we are not yet distributing media-nommer on PyPi, the easiest way is to
+install the package is through <strong class="command">pip</strong>:</p>
+<div class="highlight-python"><pre>pip install txrestapi twisted
+pip install --upgrade git+http://github.com/duointeractive/media-nommer.git#egg=media_nommer</pre>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This will only work once we start distributing media-nommer on PyPi. For
-now, you&#8217;ll need to download a tarball/zip, or check the source out from
-our <a class="reference external" href="https://github.com/duointeractive/media-nommer">GitHub project</a> and install via the enclosed <tt class="docutils literal"><span class="pre">setup.py</span></tt>. See the
-<tt class="docutils literal"><span class="pre">requirements.txt</span></tt> within the project for dependencies.</p>
+<p class="last">If you don&#8217;t have access to <strong class="command">pip</strong>, you may download a tarball/zip,
+from our <a class="reference external" href="https://github.com/duointeractive/media-nommer">GitHub project</a> and install via the enclosed <tt class="docutils literal"><span class="pre">setup.py</span></tt>. See
+the <tt class="docutils literal"><span class="pre">requirements.txt</span></tt> within the project for dependencies.</p>
 </div>
-<p>You will then need to visit <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a> and sign up for the following
-services:</p>
+<p>We have to install Twisted before media-nommer because of an odd behavior
+with <strong class="command">pip</strong>.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Any time that you upgrade or re-install Twisted, you must also
+re-install media-nommer.</p>
+</div>
+</div>
+<div class="section" id="signing-up-for-aws">
+<h2>Signing up for AWS<a class="headerlink" href="#signing-up-for-aws" title="Permalink to this headline">¶</a></h2>
+<p>After you have installed the media-nommer Python package on your machine(s),
+you&#8217;ll need to visit <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a> and sign up for the following services:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a></li>
 <li><a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a></li>
 <li><a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a></li>
 </ul>
+<p>It is important to understand that even if you already have an Amazon account,
+you need to sign up to each of these services specifically for your account to
+have access to said services. This is a very quick process, and typically
+involves looking over an agreement and accepting it.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Signing up for these services is outside the scope of this document.
+Please contact <a class="reference external" href="http://aws.amazon.com/">AWS</a> support with questions regarding this step. Their
+community forums are also a great resource.</p>
+</div>
 <p>Fees are based on what you actually use, so signing up for these services will
 incur no costs unless you use them.</p>
-<p>You will then want to create a <tt class="docutils literal"><span class="pre">media_nommer</span></tt> <em>Security Group</em> through the
-<a class="reference external" href="http://aws.amazon.com/">AWS</a> management console for your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances to be part of. You will also
-need to create an SSH key pair. Make sure to keep track of the name of your
-key pair, as you will need that in the configuration stage.</p>
+<p>You will need to create a <tt class="docutils literal"><span class="pre">media_nommer</span></tt> EC2 <em>Security Group</em> through the
+<a class="reference external" href="http://aws.amazon.com/">AWS</a> management console for your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances to be part of.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Failure to create an EC2 security group will result in
+media-nommer not being able to spawn EC2 instances, which means
+no encoding for you.</p>
+</div>
+<p>You will also need to create an SSH key pair. Make sure to keep track of the
+name of your key pair, as you will need this in the configuration stage.</p>
 </div>
 <div class="section" id="configuring">
 <span id="installing-configuring"></span><h2>Configuring<a class="headerlink" href="#configuring" title="Permalink to this headline">¶</a></h2>
@@ -152,15 +178,23 @@ defaults) that you may override in your <tt class="file docutils literal"><span 
 <div class="section" id="presets">
 <h2>Presets<a class="headerlink" href="#presets" title="Permalink to this headline">¶</a></h2>
 <p>Presets are ways to shorten and simplify your job submission API calls. They
-also make :ref:Nommers &lt;nommers&gt;` available via the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>.</p>
+also make <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> available via the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">For a <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> to be available via the
-<a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>, you must specify at least a</p>
+<p class="last">Encoding jobs are submitted through the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>
+by specifying a preset to use, instead of referring to a
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> directly. If you want to make a
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> available through the <a class="reference internal" href="jsonapi.html"><em>JSON API</em></a>,
+you will need a preset key containing a dict with a
+<tt class="docutils literal"><span class="pre">nommer</span></tt> key pointing to the nommer&#8217;s class (as in the example in the
+<em>Configuring</em> section).</p>
 </div>
 <p>At the very least, you&#8217;ll need to add a basic preset to for each of the
-:ref:Nommers &lt;nommers&gt;` you&#8217;d like to use. Specifying the <tt class="docutils literal"><span class="pre">options</span></tt> dict
-is completely optional.</p>
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> you&#8217;d like to use. Specifying the <tt class="docutils literal"><span class="pre">options</span></tt> dict
+is completely optional, and may be overridden in your API request. Also keep
+in mind that the <tt class="docutils literal"><span class="pre">options</span></tt> dict may differ, depending on the
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommers</em></a> you&#8217;re using (see the
+<a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a> docs for more details).</p>
 <p>You&#8217;ll want to look at the
 <a class="reference internal" href="apiref/conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a> setting for more
 details on how this works. The documentation for the <a class="reference internal" href="ec2nommerd.html#nommers"><em>Nommer</em></a>
@@ -200,6 +234,7 @@ help get stuff done.</p>
 <li><a class="reference internal" href="#assumptions">Assumptions</a></li>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
 <li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#signing-up-for-aws">Signing up for AWS</a></li>
 <li><a class="reference internal" href="#configuring">Configuring</a></li>
 <li><a class="reference internal" href="#presets">Presets</a></li>
 <li><a class="reference internal" href="#starting-feederd">Starting feederd</a></li>
@@ -256,7 +291,7 @@ help get stuff done.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2010, DUO Interactive, LLC.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>

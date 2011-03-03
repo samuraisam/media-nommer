@@ -219,9 +219,49 @@
 <span class="n">PRESETS</span> <span class="o">=</span> <span class="p">()</span>
 <span class="sd">&quot;&quot;&quot;Default: ``()``</span>
 
-<span class="sd">A dict of workflow presets. You must at least specify the Nommer class to</span>
-<span class="sd">use for each preset, but can go as far as specifying all encoding options,</span>
-<span class="sd">too.&quot;&quot;&quot;</span>
+<span class="sd">A dict of workflow preset dicts. You must at least specify the </span>
+<span class="sd">:ref:`Nommer &lt;nommers&gt;` class to use for each preset, but can go as far as </span>
+<span class="sd">specifying defaults for all encoding options, too.</span>
+
+<span class="sd">.. note::</span>
+<span class="sd">    You **must** specify at least one preset. Each preset may only use one</span>
+<span class="sd">    :ref:`Nommer &lt;nommers&gt;`.</span>
+
+<span class="sd">This is a minimal preset::</span>
+
+<span class="sd">    PRESETS = {</span>
+<span class="sd">        &#39;ffmpeg&#39;: {</span>
+<span class="sd">            &#39;nommer&#39;: &#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;,</span>
+<span class="sd">        },</span>
+<span class="sd">    }</span>
+<span class="sd">    </span>
+<span class="sd">Depending on which :ref:`Nommer &lt;nommers&gt;` you use, some may allow you</span>
+<span class="sd">to specify some default values to be passed to whatever software the</span>
+<span class="sd">:ref:`Nommer &lt;nommers&gt;` employs::</span>
+
+<span class="sd">    PRESETS = {</span>
+<span class="sd">        &#39;preset_with_defaults&#39;: {</span>
+<span class="sd">            &#39;nommer&#39;: &#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;,</span>
+<span class="sd">            &#39;options&#39;: {</span>
+<span class="sd">                # These are passed as outfile options to ffmpeg</span>
+<span class="sd">                &#39;outfile_options&#39;: {</span>
+<span class="sd">                    &#39;s&#39;: &#39;320x240&#39;,</span>
+<span class="sd">                    &#39;r&#39;: &#39;15&#39;,</span>
+<span class="sd">                    &#39;sameq&#39;: None,</span>
+<span class="sd">                    &#39;ar&#39;: &#39;22050&#39;,</span>
+<span class="sd">                    &#39;ab&#39;: &#39;48&#39;,</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+<span class="sd">        },</span>
+<span class="sd">    }</span>
+
+<span class="sd">These may be over-ridden on a per-job basis. Anything in ``options`` merely</span>
+<span class="sd">serves as a default value.</span>
+
+<span class="sd">.. note:: The contents of the ``options`` dict will vary depending on which</span>
+<span class="sd">    :ref:`Nommer &lt;nommers&gt;` you use. See your nommer&#39;s documentation for</span>
+<span class="sd">    details on what this should look like.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 
           </div>
@@ -262,7 +302,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2010, DUO Interactive, LLC.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
     </div>
   </body>
 </html>
