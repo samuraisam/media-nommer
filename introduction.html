@@ -1,0 +1,184 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>An Introduction to media-nommer &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="index.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="media-nommer: A Python-based media encoder system" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="media-nommer: A Python-based media encoder system"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="an-introduction-to-media-nommer">
+<h1>An Introduction to media-nommer<a class="headerlink" href="#an-introduction-to-media-nommer" title="Permalink to this headline">¶</a></h1>
+<p>media-nommer is a <a class="reference external" href="http://python.org">Python</a>-based, distributed media encoding system. It aims to
+implement much of the same services offered by commercial encoding services.
+The primary advantage afforded by media-nommer is that one only pays for what
+they use on <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>, with no additional price mark-up. It may also be
+completely customized to meet your needs.</p>
+<div class="section" id="some-background">
+<h2>Some Background<a class="headerlink" href="#some-background" title="Permalink to this headline">¶</a></h2>
+<p>There are any number of encoding services around the web, some of which are
+cheap and very easy to use. We (<a class="reference external" href="http://duointeractive.com">DUO Interactive</a>) were searching
+for a suitable fit for two different projects that an extreme amount of
+encoding scalability. However, the more we looked into it, the more we
+struggled with picking a service that had a good balance of affordability and
+permanence. We also were looking for a little more customizability in the
+encoding process.</p>
+<p>Many encoding services use software such as <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a>, and encode media to codecs
+that they have not paid licensing fees for. If the service has any
+degree of success, it is only a matter of time before MPEG-LA and others come
+knocking to get their licensing fees. This often spells end-of-game for the
+smaller (often cheaper) services. On the other end of the spectrum, some
+100% legal services have to raise their prices up to cover the large licensing
+fees, putting it outside the realm of what we&#8217;d like to pay. A good read on
+this subject can be found on the <a class="reference external" href="http://ffmpeg.org/legal.html">FFmpeg legal</a> page.</p>
+<p>For those of us who don&#8217;t need to encode to royalty-encumbered formats, a
+cheaper, more customizable, and more permanent solution was to just write our
+own. The result of all of this was the creation of media-nommer, a
+<a class="reference external" href="http://python.org">Python</a>-based media encoding system with scalability and flexibility in mind.</p>
+</div>
+<div class="section" id="a-high-level-overview">
+<h2>A high level overview<a class="headerlink" href="#a-high-level-overview" title="Permalink to this headline">¶</a></h2>
+<p>media-nommer is comprised of two primary componenets, <a class="reference internal" href="feederd.html"><em>feederd</em></a> and
+<a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>.</p>
+<div class="section" id="feederd">
+<h3>feederd<a class="headerlink" href="#feederd" title="Permalink to this headline">¶</a></h3>
+<p>Distributed encoding requires a director or orchestrator to keep
+everything running as it should. This is where the <a class="reference internal" href="feederd.html"><em>feederd</em></a> daemon
+comes into play. Here are some of the things it does:</p>
+<ul class="simple">
+<li>Manages your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances (which have the <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> daemon
+running on them), and intelligently spins up more instances
+according to your configuration and work load.</li>
+<li>Keeps track of the status of your encoding jobs, present and past.</li>
+<li>Exposes a simple JSON-based API that can be used to schedule jobs, and
+check on the status of those that are currently running or completed.</li>
+</ul>
+<p><a class="reference internal" href="feederd.html"><em>feederd</em></a> may be ran on your current infrastructure, or on <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a>. Your
+<a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> nodes are never in direct contact with <a class="reference internal" href="feederd.html"><em>feederd</em></a>, and instead
+communicate through <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>.</p>
+</div>
+<div class="section" id="ec2nommerd">
+<h3>ec2nommerd<a class="headerlink" href="#ec2nommerd" title="Permalink to this headline">¶</a></h3>
+<p>Where <a class="reference internal" href="feederd.html"><em>feederd</em></a> is the manager, <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a> is the worker. Your
+basic unit of work is an <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance that runs <a class="reference internal" href="ec2nommerd.html"><em>ec2nommerd</em></a>. This
+daemon simple checks a <a class="reference external" href="http://aws.amazon.com/sqs/">SQS</a> queue for jobs that need to be encoded, and does
+so until the queue is empty. After a period of inactivity, your <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances
+will terminate themselves, saving you money.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">An Introduction to media-nommer</a><ul>
+<li><a class="reference internal" href="#some-background">Some Background</a></li>
+<li><a class="reference internal" href="#a-high-level-overview">A high level overview</a><ul>
+<li><a class="reference internal" href="#feederd">feederd</a></li>
+<li><a class="reference internal" href="#ec2nommerd">ec2nommerd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">media-nommer: A Python-based media encoder system</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/introduction.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="media-nommer: A Python-based media encoder system"
+             >previous</a> |</li>
+        <li><a href="index.html">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

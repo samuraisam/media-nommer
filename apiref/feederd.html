@@ -1,0 +1,434 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.feederd &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../index.html" />
+    <link rel="up" title="media-nommer module reference" href="index.html" />
+    <link rel="prev" title="media_nommer.ec2nommerd" href="ec2nommerd.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="media_nommer.ec2nommerd"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">media-nommer module reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-media_nommer.feederd">
+<span id="media-nommer-feederd"></span><h1>media_nommer.feederd<a class="headerlink" href="#module-media_nommer.feederd" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the logic for the <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> daemon that oversees
+the encoding process, <a class="reference internal" href="../feederd.html"><em>feederd</em></a>. Only things that are specific to
+this daemon should reside within this module. Anything that could conceivably
+also be useful to <a class="reference internal" href="ec2nommerd.html#module-media_nommer.ec2nommerd" title="media_nommer.ec2nommerd"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.ec2nommerd</span></tt></a> should probably be in
+<a class="reference internal" href="core.html#module-media_nommer.core" title="media_nommer.core"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.core</span></tt></a>.</p>
+<div class="section" id="module-media_nommer.feederd.ec2_instance_manager">
+<span id="ec2-instance-manager"></span><h2>ec2_instance_manager<a class="headerlink" href="#module-media_nommer.feederd.ec2_instance_manager" title="Permalink to this headline">¶</a></h2>
+<p>Contains the <a class="reference internal" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager" title="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager"><tt class="xref py py-class docutils literal"><span class="pre">EC2InstanceManager</span></tt></a> class, which helps manage the
+currently active instances.</p>
+<dl class="class">
+<dt id="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager">
+<em class="property">class </em><tt class="descclassname">media_nommer.feederd.ec2_instance_manager.</tt><tt class="descname">EC2InstanceManager</tt><a class="reference internal" href="../_modules/media_nommer/feederd/ec2_instance_manager.html#EC2InstanceManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class managers and creates <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances from the configured
+encoder AMI. Additional instances are spawned based on the size of the job 
+queue in relation to the amount of manpower available at any point in time.</p>
+<dl class="classmethod">
+<dt id="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.get_instances">
+<em class="property">classmethod </em><tt class="descname">get_instances</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/ec2_instance_manager.html#EC2InstanceManager.get_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.get_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of boto 
+<a class="reference external" href="http://boto.cloudhackers.com/ref/ec2.html#boto.ec2.instance.Instance" title="(in boto v2.0)"><tt class="xref py py-class docutils literal"><span class="pre">Instance</span></tt></a> objects matching the
+media-nommer AMI, as per 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.EC2_AMI_ID" title="media_nommer.conf.settings.EC2_AMI_ID"><tt class="xref py py-data docutils literal"><span class="pre">media_nommer.conf.settings.EC2_AMI_ID</span></tt></a>. Also filters only
+running instances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A list of <a class="reference external" href="http://boto.cloudhackers.com/ref/ec2.html#boto.ec2.instance.Instance" title="(in boto v2.0)"><tt class="xref py py-class docutils literal"><span class="pre">boto.ec2.instance.Instance</span></tt></a> objects 
+representing currently active media-nommer 
+<a class="reference internal" href="../ec2nommerd.html"><em>ec2nommerd</em></a> instances.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed">
+<em class="property">classmethod </em><tt class="descname">spawn_if_needed</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/ec2_instance_manager.html#EC2InstanceManager.spawn_if_needed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns additional EC2 instances if needed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://boto.cloudhackers.com/ref/ec2.html#boto.ec2.instance.Reservation" title="(in boto v2.0)"><tt class="xref py py-class docutils literal"><span class="pre">boto.ec2.instance.Reservation</span></tt></a> or <tt class="xref docutils literal"><span class="pre">None</span></tt></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">If instances are spawned, return a boto Reservation
+object. If no instances are spawned, <tt class="xref docutils literal"><span class="pre">None</span></tt> is returned.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_instances">
+<em class="property">classmethod </em><tt class="descname">spawn_instances</tt><big>(</big><em>num_instances</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/ec2_instance_manager.html#EC2InstanceManager.spawn_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns the number of instances specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_instances</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of instances to spawn.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://boto.cloudhackers.com/ref/ec2.html#boto.ec2.instance.Reservation" title="(in boto v2.0)"><tt class="xref py py-class docutils literal"><span class="pre">boto.ec2.instance.Reservation</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A boto Reservation for the started instance(s).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-media_nommer.feederd.interval_tasks">
+<span id="interval-tasks"></span><h2>interval_tasks<a class="headerlink" href="#module-media_nommer.feederd.interval_tasks" title="Permalink to this headline">¶</a></h2>
+<p>This module contains tasks that are executed at intervals, and is imported at
+the time the server is started. Much of <a class="reference internal" href="../feederd.html"><em>feederd</em></a>&#8216;s &#8216;intelligence&#8217; 
+can be found here.</p>
+<p>All functions prefixed with <tt class="docutils literal"><span class="pre">task_</span></tt> are task functions that are registered
+with the <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> reactor. All functions prefixed with <tt class="docutils literal"><span class="pre">threaded_</span></tt> are
+the interesting bits that actually do things.</p>
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.register_tasks">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">register_tasks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#register_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.register_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers all tasks. Called by the <a class="reference internal" href="../feederd.html"><em>feederd</em></a> <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.task_check_for_job_state_changes">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">task_check_for_job_state_changes</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#task_check_for_job_state_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.task_check_for_job_state_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for job state changes in a non-blocking manner.</p>
+<p>Calls <a class="reference internal" href="#media_nommer.feederd.interval_tasks.threaded_check_for_job_state_changes" title="media_nommer.feederd.interval_tasks.threaded_check_for_job_state_changes"><tt class="xref py py-func docutils literal"><span class="pre">threaded_check_for_job_state_changes()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.task_manage_ec2_instances">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">task_manage_ec2_instances</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#task_manage_ec2_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.task_manage_ec2_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the instance creation logic in a non-blocking manner.</p>
+<p>Calls <a class="reference internal" href="#media_nommer.feederd.interval_tasks.threaded_manage_ec2_instances" title="media_nommer.feederd.interval_tasks.threaded_manage_ec2_instances"><tt class="xref py py-func docutils literal"><span class="pre">threaded_manage_ec2_instances()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.task_prune_jobs">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">task_prune_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#task_prune_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.task_prune_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prune expired or abandoned jobs from the domain specified in the 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN" title="media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN"><tt class="xref py py-data docutils literal"><span class="pre">SIMPLEDB_JOB_STATE_DOMAIN</span></tt></a>
+setting. Also prunes <a class="reference internal" href="../feederd.html"><em>feederd</em></a>&#8216;s job cache.</p>
+<p>Calls <a class="reference internal" href="#media_nommer.feederd.interval_tasks.threaded_prune_jobs" title="media_nommer.feederd.interval_tasks.threaded_prune_jobs"><tt class="xref py py-func docutils literal"><span class="pre">threaded_prune_jobs()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.threaded_check_for_job_state_changes">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">threaded_check_for_job_state_changes</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#threaded_check_for_job_state_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.threaded_check_for_job_state_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the SQS queue specified in the
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.SQS_JOB_STATE_CHANGE_QUEUE_NAME" title="media_nommer.conf.settings.SQS_JOB_STATE_CHANGE_QUEUE_NAME"><tt class="xref py py-data docutils literal"><span class="pre">SQS_JOB_STATE_CHANGE_QUEUE_NAME</span></tt></a>
+setting for announcements of state changes from the <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances running
+<a class="reference internal" href="../ec2nommerd.html"><em>ec2nommerd</em></a>. This lets <a class="reference internal" href="../feederd.html"><em>feederd</em></a> know it needs to get 
+updated job details from the <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> domain defined in the
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN" title="media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN"><tt class="xref py py-data docutils literal"><span class="pre">SIMPLEDB_JOB_STATE_DOMAIN</span></tt></a>
+setting.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.threaded_manage_ec2_instances">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">threaded_manage_ec2_instances</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#threaded_manage_ec2_instances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.threaded_manage_ec2_instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the current number of jobs needing encoding and compares them
+to the pool of currently running <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances. Spawns more instances
+as needed.</p>
+<p>See source of 
+<a class="reference internal" href="#media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed" title="media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed"><tt class="xref py py-meth docutils literal"><span class="pre">media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed()</span></tt></a> 
+for the logic behind this.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.feederd.interval_tasks.threaded_prune_jobs">
+<tt class="descclassname">media_nommer.feederd.interval_tasks.</tt><tt class="descname">threaded_prune_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/interval_tasks.html#threaded_prune_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.interval_tasks.threaded_prune_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sometimes failure happens, but a Nommer doesn&#8217;t handle said failure
+gracefully. Instead of state changing to <tt class="docutils literal"><span class="pre">ERROR</span></tt>, it gets stuck in
+some un-finished state in the <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a> domain defined in
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN" title="media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN"><tt class="xref py py-data docutils literal"><span class="pre">SIMPLEDB_JOB_STATE_DOMAIN</span></tt></a>
+setting.</p>
+<p>This process finds jobs that haven&#8217;t been updated in a very long time
+(a day or so) that are probably dead. It marks them with an <tt class="docutils literal"><span class="pre">ABANDONED</span></tt>
+state, letting us know something went really wrong.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-media_nommer.feederd.job_cache">
+<span id="job-cache"></span><h2>job_cache<a class="headerlink" href="#module-media_nommer.feederd.job_cache" title="Permalink to this headline">¶</a></h2>
+<p>Basic job caching module.</p>
+<dl class="class">
+<dt id="media_nommer.feederd.job_cache.JobCache">
+<em class="property">class </em><tt class="descclassname">media_nommer.feederd.job_cache.</tt><tt class="descname">JobCache</tt><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Caches currently active 
+<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">media_nommer.core.job_state_backend.EncodingJob</span></tt></a> objects. 
+This is presently only un-finished jobs, as defined by
+<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.JobStateBackend.FINISHED_STATES" title="media_nommer.core.job_state_backend.JobStateBackend.FINISHED_STATES"><tt class="xref py py-attr docutils literal"><span class="pre">media_nommer.core.job_state_backend.JobStateBackend.FINISHED_STATES</span></tt></a>.</p>
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.abandon_stale_jobs">
+<em class="property">classmethod </em><tt class="descname">abandon_stale_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.abandon_stale_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.abandon_stale_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>On rare occasions, nommers crash so hard that no <tt class="docutils literal"><span class="pre">ERROR</span></tt> state change 
+is made, and the job just gets stuck in a permanent unfinished state
+(<tt class="docutils literal"><span class="pre">DOWNLOADING</span></tt>, <tt class="docutils literal"><span class="pre">ENCODING</span></tt>, <tt class="docutils literal"><span class="pre">UPLOADING</span></tt>, etc). Rather than hang 
+on to these indefinitely, abandon them by setting their state to
+<tt class="docutils literal"><span class="pre">ABANDONED</span></tt>.</p>
+<p>The threshold for which jobs are considered abandoned is configurable
+via the
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.FEEDERD_ABANDON_INACTIVE_JOBS_THRESH" title="media_nommer.conf.settings.FEEDERD_ABANDON_INACTIVE_JOBS_THRESH"><tt class="xref py py-data docutils literal"><span class="pre">FEEDERD_ABANDON_INACTIVE_JOBS_THRESH</span></tt></a>
+setting.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.get_cached_jobs">
+<em class="property">classmethod </em><tt class="descname">get_cached_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.get_cached_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.get_cached_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of all cached jobs. The keys are unique IDs, the
+values are the job objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A dictionary with the keys being unique IDs of cached jobs,
+and the values being 
+<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>
+instances.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.get_job">
+<em class="property">classmethod </em><tt class="descname">get_job</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.get_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.get_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a job&#8217;s unique id, return the job object from the cache.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>job</strong> (<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>) &#8211; A job&#8217;s unique ID or a job object.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">The cached encoding job.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.get_jobs_with_state">
+<em class="property">classmethod </em><tt class="descname">get_jobs_with_state</tt><big>(</big><em>state</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.get_jobs_with_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.get_jobs_with_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a valid job state (refer to 
+<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.JobStateBackend.JOB_STATES" title="media_nommer.core.job_state_backend.JobStateBackend.JOB_STATES"><tt class="xref py py-attr docutils literal"><span class="pre">media_nommer.core.job_state_backend.JobStateBackend.JOB_STATES</span></tt></a>),
+return all jobs that currently have this state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The job state to query by.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">list</span></tt> of <a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A list of jobs matching the given state.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.is_job_cached">
+<em class="property">classmethod </em><tt class="descname">is_job_cached</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.is_job_cached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.is_job_cached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a job object or a unique id, return True if said job is cached, 
+and False if not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>job</strong> (<tt class="docutils literal"><span class="pre">str</span></tt> or <a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>) &#8211; A job&#8217;s unique ID or a job object.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt> if the given job exists in the cache, <tt class="xref docutils literal"><span class="pre">False</span></tt>
+if otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.load_recent_jobs_at_startup">
+<em class="property">classmethod </em><tt class="descname">load_recent_jobs_at_startup</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.load_recent_jobs_at_startup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.load_recent_jobs_at_startup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all of the un-finished jobs into the job cache. This is
+performed when <a class="reference internal" href="../feederd.html"><em>feederd</em></a> starts.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.refresh_jobs_with_state_changes">
+<em class="property">classmethod </em><tt class="descname">refresh_jobs_with_state_changes</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.refresh_jobs_with_state_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.refresh_jobs_with_state_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the state SQS queue specified by the
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.SQS_JOB_STATE_CHANGE_QUEUE_NAME" title="media_nommer.conf.settings.SQS_JOB_STATE_CHANGE_QUEUE_NAME"><tt class="xref py py-data docutils literal"><span class="pre">SQS_JOB_STATE_CHANGE_QUEUE_NAME</span></tt></a>
+setting and refreshes any jobs that have changed. This simply reloads
+the job&#8217;s details from <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">list</span></tt> of <a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a></td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">A list of changed <tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt> objects.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.remove_job">
+<em class="property">classmethod </em><tt class="descname">remove_job</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.remove_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.remove_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a job from the cache.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>job</strong> (<tt class="docutils literal"><span class="pre">str</span></tt> or <a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>) &#8211; A job&#8217;s unique ID or a job object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.uncache_finished_jobs">
+<em class="property">classmethod </em><tt class="descname">uncache_finished_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.uncache_finished_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.uncache_finished_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears jobs from the cache after they have been finished.</p>
+<p>TODO: We&#8217;ll eventually want to clear jobs from the cache that haven&#8217;t
+been accessed by the web API recently.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.feederd.job_cache.JobCache.update_job">
+<em class="property">classmethod </em><tt class="descname">update_job</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/feederd/job_cache.html#JobCache.update_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.feederd.job_cache.JobCache.update_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates a job in the cache. Creates the key if it doesn&#8217;t
+already exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>job</strong> (<a class="reference internal" href="core.html#media_nommer.core.job_state_backend.EncodingJob" title="media_nommer.core.job_state_backend.EncodingJob"><tt class="xref py py-class docutils literal"><span class="pre">EncodingJob</span></tt></a>) &#8211; The job to update (or create) a cache entry for.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">media_nommer.feederd</a><ul>
+<li><a class="reference internal" href="#module-media_nommer.feederd.ec2_instance_manager">ec2_instance_manager</a></li>
+<li><a class="reference internal" href="#module-media_nommer.feederd.interval_tasks">interval_tasks</a></li>
+<li><a class="reference internal" href="#module-media_nommer.feederd.job_cache">job_cache</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ec2nommerd.html"
+                        title="previous chapter">media_nommer.ec2nommerd</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/apiref/feederd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ec2nommerd.html" title="media_nommer.ec2nommerd"
+             >previous</a> |</li>
+        <li><a href="../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >media-nommer module reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

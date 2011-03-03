@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.feederd.interval_tasks &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for media_nommer.feederd.interval_tasks</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains tasks that are executed at intervals, and is imported at</span>
+<span class="sd">the time the server is started. Much of :doc:`../feederd`&#39;s &#39;intelligence&#39; </span>
+<span class="sd">can be found here.</span>
+
+<span class="sd">All functions prefixed with ``task_`` are task functions that are registered</span>
+<span class="sd">with the Twisted_ reactor. All functions prefixed with ``threaded_`` are</span>
+<span class="sd">the interesting bits that actually do things.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">media_nommer.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">media_nommer.utils</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">media_nommer.feederd.job_cache</span> <span class="kn">import</span> <span class="n">JobCache</span>
+<span class="kn">from</span> <span class="nn">media_nommer.feederd.ec2_instance_manager</span> <span class="kn">import</span> <span class="n">EC2InstanceManager</span>
+
+<div class="viewcode-block" id="threaded_check_for_job_state_changes"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.threaded_check_for_job_state_changes">[docs]</a><span class="k">def</span> <span class="nf">threaded_check_for_job_state_changes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks the SQS queue specified in the</span>
+<span class="sd">    :py:data:`SQS_JOB_STATE_CHANGE_QUEUE_NAME &lt;media_nommer.conf.settings.SQS_JOB_STATE_CHANGE_QUEUE_NAME&gt;`</span>
+<span class="sd">    setting for announcements of state changes from the EC2_ instances running</span>
+<span class="sd">    :doc:`../ec2nommerd`. This lets :doc:`../feederd` know it needs to get </span>
+<span class="sd">    updated job details from the SimpleDB_ domain defined in the</span>
+<span class="sd">    :py:data:`SIMPLEDB_JOB_STATE_DOMAIN &lt;media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN&gt;`</span>
+<span class="sd">    setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">JobCache</span><span class="o">.</span><span class="n">refresh_jobs_with_state_changes</span><span class="p">()</span>
+    <span class="c"># If jobs have completed, remove them from the job cache.</span>
+    <span class="n">JobCache</span><span class="o">.</span><span class="n">uncache_finished_jobs</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="task_check_for_job_state_changes"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.task_check_for_job_state_changes">[docs]</a><span class="k">def</span> <span class="nf">task_check_for_job_state_changes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks for job state changes in a non-blocking manner.</span>
+<span class="sd">    </span>
+<span class="sd">    Calls :py:func:`threaded_check_for_job_state_changes`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callInThread</span><span class="p">(</span><span class="n">threaded_check_for_job_state_changes</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="threaded_prune_jobs"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.threaded_prune_jobs">[docs]</a><span class="k">def</span> <span class="nf">threaded_prune_jobs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sometimes failure happens, but a Nommer doesn&#39;t handle said failure</span>
+<span class="sd">    gracefully. Instead of state changing to ``ERROR``, it gets stuck in</span>
+<span class="sd">    some un-finished state in the SimpleDB_ domain defined in</span>
+<span class="sd">    :py:data:`SIMPLEDB_JOB_STATE_DOMAIN &lt;media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN&gt;`</span>
+<span class="sd">    setting.</span>
+<span class="sd">    </span>
+<span class="sd">    This process finds jobs that haven&#39;t been updated in a very long time</span>
+<span class="sd">    (a day or so) that are probably dead. It marks them with an ``ABANDONED``</span>
+<span class="sd">    state, letting us know something went really wrong.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">JobCache</span><span class="o">.</span><span class="n">abandon_stale_jobs</span><span class="p">()</span>
+    <span class="c"># Expire any newly abandoned jobs, too. Removes them from job cache.</span>
+    <span class="n">JobCache</span><span class="o">.</span><span class="n">uncache_finished_jobs</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="task_prune_jobs"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.task_prune_jobs">[docs]</a><span class="k">def</span> <span class="nf">task_prune_jobs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prune expired or abandoned jobs from the domain specified in the </span>
+<span class="sd">    :py:data:`SIMPLEDB_JOB_STATE_DOMAIN &lt;media_nommer.conf.settings.SIMPLEDB_JOB_STATE_DOMAIN&gt;`</span>
+<span class="sd">    setting. Also prunes :doc:`../feederd`&#39;s job cache.</span>
+<span class="sd">    </span>
+<span class="sd">    Calls :py:func:`threaded_prune_jobs`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callInThread</span><span class="p">(</span><span class="n">threaded_prune_jobs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="threaded_manage_ec2_instances"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.threaded_manage_ec2_instances">[docs]</a><span class="k">def</span> <span class="nf">threaded_manage_ec2_instances</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Looks at the current number of jobs needing encoding and compares them</span>
+<span class="sd">    to the pool of currently running EC2_ instances. Spawns more instances</span>
+<span class="sd">    as needed.</span>
+<span class="sd">    </span>
+<span class="sd">    See source of </span>
+<span class="sd">    :py:meth:`media_nommer.feederd.ec2_instance_manager.EC2InstanceManager.spawn_if_needed` </span>
+<span class="sd">    for the logic behind this.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">EC2InstanceManager</span><span class="o">.</span><span class="n">spawn_if_needed</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="task_manage_ec2_instances"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.task_manage_ec2_instances">[docs]</a><span class="k">def</span> <span class="nf">task_manage_ec2_instances</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calls the instance creation logic in a non-blocking manner.</span>
+<span class="sd">    </span>
+<span class="sd">    Calls :py:func:`threaded_manage_ec2_instances`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callInThread</span><span class="p">(</span><span class="n">threaded_manage_ec2_instances</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="register_tasks"><a class="viewcode-back" href="../../../apiref/feederd.html#media_nommer.feederd.interval_tasks.register_tasks">[docs]</a><span class="k">def</span> <span class="nf">register_tasks</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers all tasks. Called by the :doc:`../feederd` Twisted_ plugin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="n">task_check_for_job_state_changes</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                            <span class="n">settings</span><span class="o">.</span><span class="n">FEEDERD_JOB_STATE_CHANGE_CHECK_INTERVAL</span><span class="p">,</span> 
+                            <span class="n">now</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    
+    <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="n">task_prune_jobs</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                            <span class="n">settings</span><span class="o">.</span><span class="n">FEEDERD_PRUNE_JOBS_INTERVAL</span><span class="p">,</span> 
+                            <span class="n">now</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    
+    <span class="c"># Only register the instance auto-spawning if enabled.</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">FEEDERD_ALLOW_EC2_LAUNCHES</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;feederd will automatically scale EC2 instances.&quot;</span><span class="p">)</span>
+        <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="n">task_manage_ec2_instances</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+                            <span class="n">settings</span><span class="o">.</span><span class="n">FEEDERD_AUTO_SCALE_INTERVAL</span><span class="p">,</span> 
+                            <span class="n">now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

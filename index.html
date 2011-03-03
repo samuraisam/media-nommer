@@ -1,0 +1,227 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media-nommer: A Python-based media encoder system &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="#" />
+    <link rel="next" title="An Introduction to media-nommer" href="introduction.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="An Introduction to media-nommer"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="media-nommer-a-python-based-media-encoder-system">
+<h1>media-nommer: A Python-based media encoder system<a class="headerlink" href="#media-nommer-a-python-based-media-encoder-system" title="Permalink to this headline">¶</a></h1>
+<p>media-nommer is a distributed media encoding system that gets its horsepower
+from <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>. This leaves you with a cheaper, more reliable alternative
+to some commercial paid encoding systems, since you are only paying for your
+<a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a> usage. The software is powered by a combination of <a class="reference external" href="http://python.org">Python</a>,
+<a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a>, and <a class="reference external" href="http://boto.cloudhackers.com/">Boto</a>, and is licensed under the flexible <a class="reference external" href="http://opensource.org/licenses/bsd-license.php">BSD License</a>.</p>
+<div class="section" id="this-may-be-useful-if">
+<h2>This may be useful if...<a class="headerlink" href="#this-may-be-useful-if" title="Permalink to this headline">¶</a></h2>
+<p>media-nommer is of interest to you if you need a way to encode media in a
+cheap, fast, and scalable manner. By using <a class="reference external" href="http://aws.amazon.com/">Amazon AWS</a>&#8216;s excellent <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a>
+service, you can automatically scale your number of encoder instances up to
+meet your demands. Of course, the entire process may be configured, limited,
+and adapted to meet your needs. Some example usage cases where media-nommer
+might be a good fit:</p>
+<ul class="simple">
+<li>Encoding user-uploaded media for serving from your site</li>
+<li>Bulk encoding large collections of videos</li>
+</ul>
+</div>
+<div class="section" id="learning-more">
+<h2>Learning more<a class="headerlink" href="#learning-more" title="Permalink to this headline">¶</a></h2>
+<p>To learn more about media-nommer, see the <a class="reference internal" href="introduction.html"><em>An Introduction to media-nommer</em></a>.</p>
+<p><strong>Project Status:</strong> Alpha</p>
+<p><strong>License:</strong> media-nommer is licensed under the <a class="reference external" href="http://opensource.org/licenses/bsd-license.php">BSD License</a>.</p>
+<p>These links may also be useful to you.</p>
+<ul class="simple">
+<li>Source repository: <a class="reference external" href="https://github.com/duointeractive/media-nommer">https://github.com/duointeractive/media-nommer</a></li>
+<li>Issue tracker: <a class="reference external" href="https://github.com/duointeractive/media-nommer/issues">https://github.com/duointeractive/media-nommer/issues</a></li>
+</ul>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">An Introduction to media-nommer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#some-background">Some Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#a-high-level-overview">A high level overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#assumptions">Assumptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#signing-up-for-aws">Signing up for AWS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#configuring">Configuring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#presets">Presets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#starting-feederd">Starting feederd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#using">Using</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="feederd.html">feederd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#what-is-feederd">What is feederd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#relationship-with-ec2nommerd">Relationship with ec2nommerd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#intelligent-scaling">Intelligent scaling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#json-api">JSON API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feederd.html#architectural-notes">Architectural notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ec2nommerd.html">ec2nommerd</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ec2nommerd.html#what-is-ec2nommerd">What is ec2nommerd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ec2nommerd.html#nommers">Nommers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="jsonapi.html">Using feederd&#8217;s JSON API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="jsonapi.html#client-api-libraries">Client API Libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jsonapi.html#api-call-reference">API Call Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="development-docs">
+<h2>Development docs<a class="headerlink" href="#development-docs" title="Permalink to this headline">¶</a></h2>
+<p>The following topics will be useful to you if you would like to help improve
+media-nommer.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hacking.html">Hacking on media-nommer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#obtaining-the-source">Obtaining the source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#installing-additional-dependencies">Installing additional dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#running-and-writing-unit-tests">Running and writing unit tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#running-feederd-locally">Running feederd locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#running-ec2nommerd-locally">Running ec2nommerd locally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#code-style">Code style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#contributing-code">Contributing code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#i-m-stumped-help">&#8220;I&#8217;m stumped, help!&#8221;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hacking.html#contributions-are-bsd-licensed">Contributions are BSD-licensed</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="apiref/index.html">media-nommer module reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apiref/conf.html">media_nommer.conf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apiref/core.html">media_nommer.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apiref/ec2nommerd.html">media_nommer.ec2nommerd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apiref/feederd.html">media_nommer.feederd</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">media-nommer: A Python-based media encoder system</a><ul>
+<li><a class="reference internal" href="#this-may-be-useful-if">This may be useful if...</a></li>
+<li><a class="reference internal" href="#learning-more">Learning more</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#development-docs">Development docs</a><ul>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="next chapter">An Introduction to media-nommer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="An Introduction to media-nommer"
+             >next</a> |</li>
+        <li><a href="#">media-nommer v1.0dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

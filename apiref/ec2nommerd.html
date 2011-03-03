@@ -1,0 +1,414 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>media_nommer.ec2nommerd &mdash; media-nommer v1.0dev documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="media-nommer v1.0dev documentation" href="../index.html" />
+    <link rel="up" title="media-nommer module reference" href="index.html" />
+    <link rel="next" title="media_nommer.feederd" href="feederd.html" />
+    <link rel="prev" title="media_nommer.core" href="core.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="feederd.html" title="media_nommer.feederd"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="core.html" title="media_nommer.core"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">media-nommer module reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-media_nommer.ec2nommerd">
+<span id="media-nommer-ec2nommerd"></span><h1>media_nommer.ec2nommerd<a class="headerlink" href="#module-media_nommer.ec2nommerd" title="Permalink to this headline">¶</a></h1>
+<p>The feederd module contains Twisted daemon that monitors queues, creates
+EC2 instances, schedules encoding jobs, handles response pings from
+external encoding services, and notifies your external applications when
+encoding has completed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only more general management logic should live in this module. Anything
+specific like encoding commands or EC2 management should live elsewhere.
+feederd is just the orchestrator.</p>
+</div>
+<div class="section" id="module-media_nommer.ec2nommerd.nommers">
+<span id="nommers"></span><h2>nommers<a class="headerlink" href="#module-media_nommer.ec2nommerd.nommers" title="Permalink to this headline">¶</a></h2>
+<p>Nommers are classes that <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances use with ec2nommerd to consume and
+produce media in the desired format. These usually involve wrapping external
+commands, setting job state details as the process continues, and uploading
+the results.</p>
+<div class="section" id="module-media_nommer.ec2nommerd.nommers.base_nommer">
+<span id="base-nommer"></span><h3>base_nommer<a class="headerlink" href="#module-media_nommer.ec2nommerd.nommers.base_nommer" title="Permalink to this headline">¶</a></h3>
+<p>Classes in this module serve as a basis for Nommers. This should be thought
+of as a protocol or a foundation to assist in maintaining a consistent API
+between Nommers.</p>
+<dl class="class">
+<dt id="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer">
+<em class="property">class </em><tt class="descclassname">media_nommer.ec2nommerd.nommers.base_nommer.</tt><tt class="descname">BaseNommer</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/base_nommer.html#BaseNommer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a base class that can be sub-classed by each Nommer to serve
+as a foundation. Required methods raise a NotImplementedError exception
+by default, unless overridden by child classes.</p>
+<dl class="method">
+<dt id="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.download_source_file">
+<tt class="descname">download_source_file</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/base_nommer.html#BaseNommer.download_source_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.download_source_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the source file to a temporary file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.onomnom">
+<tt class="descname">onomnom</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/base_nommer.html#BaseNommer.onomnom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.onomnom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start nomming. If you&#8217;re going to override this, make sure to follow
+the same basic job state updating flow if possible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.upload_to_destination">
+<tt class="descname">upload_to_destination</tt><big>(</big><em>fobj</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/base_nommer.html#BaseNommer.upload_to_destination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.upload_to_destination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload the output file to the destination specified by the user.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.wrapped_set_job_state">
+<tt class="descname">wrapped_set_job_state</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/base_nommer.html#BaseNommer.wrapped_set_job_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.base_nommer.BaseNommer.wrapped_set_job_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps set_job_state() to perform extra actions before and/or after
+job state updates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_state</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The job state to set.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>ffmpeg<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-media_nommer.ec2nommerd.nommers.ffmpeg"></span><p>Contains a class used for nomming media on EC2 via <a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a>. This is used in
+conjunction with the ec2nommerd <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin.</p>
+<dl class="class">
+<dt id="media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer">
+<em class="property">class </em><tt class="descclassname">media_nommer.ec2nommerd.nommers.ffmpeg.</tt><tt class="descname">FFmpegNommer</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/nommers/ffmpeg.html#FFmpegNommer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This <a class="reference internal" href="../ec2nommerd.html#nommers"><em>Nommer</em></a> is used to encode media with the excellent
+<a class="reference external" href="http://www.ffmpeg.org/">FFmpeg</a> utility.</p>
+<p><strong>Presets</strong></p>
+<p>Below is an example 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.PRESETS" title="media_nommer.conf.settings.PRESETS"><tt class="xref py py-data docutils literal"><span class="pre">PRESETS</span></tt></a>
+dict for FFmpegNommer:</p>
+<div class="highlight-python"><pre>'your_preset_name_here': {
+    'nommer': 'media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer',
+    'options': [
+        {
+            # These would be passed as infile options to ffmpeg
+            'infile_options': {
+            },
+            # These are passed as outfile options to ffmpeg
+            'outfile_options': {
+                's': '320x240',
+                # Some flags don't have values, like sameq
+                'sameq': None,
+                'ar': '22050',
+                'ab': '48',
+            }
+        }, # end pass 1
+    ], # end encoding pass list (max of 2)
+} # end preset</pre>
+</div>
+<p>In this case, the command created by this nommer would end up being:</p>
+<div class="highlight-python"><pre>ffmpeg -y -i &lt;infilename&gt; -s 320x240 -sameq -ar 22050 -ab 48 &lt;outfilename&gt;</pre>
+</div>
+<p>Note that the <tt class="docutils literal"><span class="pre">sameq</span></tt> key in our <tt class="docutils literal"><span class="pre">outfile_options</span></tt> dict above has a
+<tt class="xref docutils literal"><span class="pre">None</span></tt> value. You&#8217;ll need to do this for flags or options that don&#8217;t
+require a value.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">Everything specified in the <tt class="docutils literal"><span class="pre">options</span></tt> dict may be overridden
+in your encoding API requests. These merely act as presets.</p>
+</div>
+<p>If you want no options by default, this is OK too:</p>
+<div class="highlight-python"><pre>'minimal_preset': {
+    'nommer': 'media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer'
+}</pre>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-media_nommer.ec2nommerd.interval_tasks">
+<span id="interval-tasks"></span><h2>interval_tasks<a class="headerlink" href="#module-media_nommer.ec2nommerd.interval_tasks" title="Permalink to this headline">¶</a></h2>
+<p>This module contains tasks that are executed at intervals, and is imported at
+the time the server is started. The intervals at which the tasks run
+are configurable via <a class="reference internal" href="conf.html#module-media_nommer.conf.settings" title="media_nommer.conf.settings"><tt class="xref py py-mod docutils literal"><span class="pre">media_nommer.conf.settings</span></tt></a>.</p>
+<p>All functions prefixed with <tt class="docutils literal"><span class="pre">task_</span></tt> are task functions that are registered
+with the <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> reactor. All functions prefixed with <tt class="docutils literal"><span class="pre">threaded_</span></tt> are
+the interesting bits that actually do things.</p>
+<dl class="function">
+<dt id="media_nommer.ec2nommerd.interval_tasks.register_tasks">
+<tt class="descclassname">media_nommer.ec2nommerd.interval_tasks.</tt><tt class="descname">register_tasks</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/interval_tasks.html#register_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.interval_tasks.register_tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers all tasks. Called by the <a class="reference internal" href="../ec2nommerd.html"><em>ec2nommerd</em></a> <a class="reference external" href="http://twistedmatrix.com/trac/">Twisted</a> plugin.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.ec2nommerd.interval_tasks.task_check_for_new_jobs">
+<tt class="descclassname">media_nommer.ec2nommerd.interval_tasks.</tt><tt class="descname">task_check_for_new_jobs</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/interval_tasks.html#task_check_for_new_jobs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.interval_tasks.task_check_for_new_jobs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at the number of currently active threads and compares it against the 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.MAX_ENCODING_JOBS_PER_EC2_INSTANCE" title="media_nommer.conf.settings.MAX_ENCODING_JOBS_PER_EC2_INSTANCE"><tt class="xref py py-data docutils literal"><span class="pre">MAX_ENCODING_JOBS_PER_EC2_INSTANCE</span></tt></a> 
+setting. If we are under the max, fire up another thread for encoding 
+additional job(s).</p>
+<p>The interval at which <a class="reference internal" href="../ec2nommerd.html"><em>ec2nommerd</em></a> checks for new jobs is 
+determined by the 
+<a class="reference internal" href="conf.html#media_nommer.conf.settings.NOMMERD_NEW_JOB_CHECK_INTERVAL" title="media_nommer.conf.settings.NOMMERD_NEW_JOB_CHECK_INTERVAL"><tt class="xref py py-data docutils literal"><span class="pre">NOMMERD_NEW_JOB_CHECK_INTERVAL</span></tt></a>
+setting.</p>
+<p>Calls <a class="reference internal" href="#media_nommer.ec2nommerd.interval_tasks.threaded_encode_job" title="media_nommer.ec2nommerd.interval_tasks.threaded_encode_job"><tt class="xref py py-func docutils literal"><span class="pre">threaded_encode_job()</span></tt></a> for any jobs to encode.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.ec2nommerd.interval_tasks.task_heartbeat">
+<tt class="descclassname">media_nommer.ec2nommerd.interval_tasks.</tt><tt class="descname">task_heartbeat</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/interval_tasks.html#task_heartbeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.interval_tasks.task_heartbeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks in with feederd in a non-blocking manner via 
+<a class="reference internal" href="#media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat" title="media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat"><tt class="xref py py-meth docutils literal"><span class="pre">threaded_heartbeat()</span></tt></a>.</p>
+<p>Calls <a class="reference internal" href="#media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat" title="media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat"><tt class="xref py py-func docutils literal"><span class="pre">threaded_heartbeat()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.ec2nommerd.interval_tasks.threaded_encode_job">
+<tt class="descclassname">media_nommer.ec2nommerd.interval_tasks.</tt><tt class="descname">threaded_encode_job</tt><big>(</big><em>job</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/interval_tasks.html#threaded_encode_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.interval_tasks.threaded_encode_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a job, run it through its encoding workflow in a non-blocking manner.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat">
+<tt class="descclassname">media_nommer.ec2nommerd.interval_tasks.</tt><tt class="descname">threaded_heartbeat</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/interval_tasks.html#threaded_heartbeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.interval_tasks.threaded_heartbeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fires off a threaded task to check in with feederd via <a class="reference external" href="http://aws.amazon.com/simpledb/">SimpleDB</a>. There
+is a domain that contains all of the running <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instances and their
+unique IDs, along with some state data.</p>
+<p>The interval at which heartbeats occur is determined by the
+<tt class="xref py py-data docutils literal"><span class="pre">NOMMERD_HEARTBEAT_INTERVAL</span> <span class="pre">&lt;media_nommer.conf.settings.NOMMERD_HEARTBEAT_INTERVAL</span></tt> 
+setting.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-media_nommer.ec2nommerd.node_state">
+<span id="node-state"></span><h2>node_state<a class="headerlink" href="#module-media_nommer.ec2nommerd.node_state" title="Permalink to this headline">¶</a></h2>
+<p>Contains the <a class="reference internal" href="#media_nommer.ec2nommerd.node_state.NodeStateManager" title="media_nommer.ec2nommerd.node_state.NodeStateManager"><tt class="xref py py-class docutils literal"><span class="pre">NodeStateManager</span></tt></a> class, which is an abstraction layer
+for storing and communicating the status of <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> nodes.</p>
+<dl class="class">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager">
+<em class="property">class </em><tt class="descclassname">media_nommer.ec2nommerd.node_state.</tt><tt class="descname">NodeStateManager</tt><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tracks this node&#8217;s state, reports it to <a class="reference internal" href="../feederd.html"><em>feederd</em></a>, and terminates 
+itself if certain conditions of inactivity are met.</p>
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.contemplate_termination">
+<em class="property">classmethod </em><tt class="descname">contemplate_termination</tt><big>(</big><em>thread_count_mod=0</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.contemplate_termination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.contemplate_termination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks at how long it&#8217;s been since this worker has done something, and
+decides whether to self-terminate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>thread_count_mod</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Add this to the amount returned by the call
+to <a class="reference internal" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.get_num_active_threads" title="media_nommer.ec2nommerd.node_state.NodeStateManager.get_num_active_threads"><tt class="xref py py-meth docutils literal"><span class="pre">get_num_active_threads()</span></tt></a>. This is useful when calling
+this method from a non-encoder thread.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt> if this instance terminated itself, <tt class="xref docutils literal"><span class="pre">False</span></tt>
+if not.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.get_instance_id">
+<em class="property">classmethod </em><tt class="descname">get_instance_id</tt><big>(</big><em>is_local=False</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.get_instance_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.get_instance_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine this EC2 instance&#8217;s unique instance ID. Lazy load this, and
+avoid further re-queries after the first one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>is_local</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; When True, don&#8217;t try to hit EC2&#8217;s meta data server,
+When False, just make up a unique ID.</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">The EC2 instance&#8217;s ID.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.get_num_active_threads">
+<em class="property">classmethod </em><tt class="descname">get_num_active_threads</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.get_num_active_threads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.get_num_active_threads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the reactor&#8217;s threadpool to see how many threads are currently
+working. This can be used to determine how busy this node is.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">The number of active threads.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.i_did_something">
+<em class="property">classmethod </em><tt class="descname">i_did_something</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.i_did_something"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.i_did_something" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pat ourselves on the back each time we do something.</p>
+<p>Used for determining whether this node&#8217;s continued existence is
+necessary anymore in <a class="reference internal" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.contemplate_termination" title="media_nommer.ec2nommerd.node_state.NodeStateManager.contemplate_termination"><tt class="xref py py-meth docutils literal"><span class="pre">contemplate_termination()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.is_ec2_instance">
+<em class="property">classmethod </em><tt class="descname">is_ec2_instance</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.is_ec2_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.is_ec2_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether this is an EC2 instance or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><tt class="xref docutils literal"><span class="pre">True</span></tt> if this is an EC2 instance, <tt class="xref docutils literal"><span class="pre">False</span></tt> if otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="media_nommer.ec2nommerd.node_state.NodeStateManager.send_instance_state_update">
+<em class="property">classmethod </em><tt class="descname">send_instance_state_update</tt><big>(</big><em>state='ACTIVE'</em><big>)</big><a class="reference internal" href="../_modules/media_nommer/ec2nommerd/node_state.html#NodeStateManager.send_instance_state_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#media_nommer.ec2nommerd.node_state.NodeStateManager.send_instance_state_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a status update to feederd through SimpleDB. Lets the daemon
+know how many jobs this instance is crunching right now. Also updates
+a timestamp field to let feederd know how long it has been since the
+instance&#8217;s last check-in.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; If this <a class="reference external" href="http://aws.amazon.com/ec2/">EC2</a> instance is anything but <tt class="docutils literal"><span class="pre">ACTIVE</span></tt>,
+pass the state here. This is useful during node termination.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">media_nommer.ec2nommerd</a><ul>
+<li><a class="reference internal" href="#module-media_nommer.ec2nommerd.nommers">nommers</a><ul>
+<li><a class="reference internal" href="#module-media_nommer.ec2nommerd.nommers.base_nommer">base_nommer</a></li>
+<li><a class="reference internal" href="#id1">ffmpeg</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-media_nommer.ec2nommerd.interval_tasks">interval_tasks</a></li>
+<li><a class="reference internal" href="#module-media_nommer.ec2nommerd.node_state">node_state</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="core.html"
+                        title="previous chapter">media_nommer.core</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="feederd.html"
+                        title="next chapter">media_nommer.feederd</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/apiref/ec2nommerd.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="feederd.html" title="media_nommer.feederd"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="core.html" title="media_nommer.core"
+             >previous</a> |</li>
+        <li><a href="../index.html">media-nommer v1.0dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >media-nommer module reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, DUO Interactive, LLC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
