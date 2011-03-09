@@ -279,16 +279,18 @@ to specify some default values to be passed to whatever software the
 <div class="highlight-python"><div class="highlight"><pre><span class="n">PRESETS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;preset_with_defaults&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s">&#39;nommer&#39;</span><span class="p">:</span> <span class="s">&#39;media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer&#39;</span><span class="p">,</span>
-        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c"># These are passed as outfile options to ffmpeg</span>
-            <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s">&#39;s&#39;</span><span class="p">:</span> <span class="s">&#39;320x240&#39;</span><span class="p">,</span>
-                <span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="s">&#39;15&#39;</span><span class="p">,</span>
-                <span class="s">&#39;sameq&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-                <span class="s">&#39;ar&#39;</span><span class="p">:</span> <span class="s">&#39;22050&#39;</span><span class="p">,</span>
-                <span class="s">&#39;ab&#39;</span><span class="p">:</span> <span class="s">&#39;48&#39;</span><span class="p">,</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
+        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="c"># These are passed as outfile options to ffmpeg</span>
+                <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="s">&#39;s&#39;</span><span class="p">,</span> <span class="s">&#39;320x240&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;15&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;sameq&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;ar&#39;</span><span class="p">,</span> <span class="s">&#39;22050&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;ab&#39;</span><span class="p">,</span> <span class="s">&#39;48&#39;</span><span class="p">),</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">],</span>
     <span class="p">},</span>
 <span class="p">}</span>
 </pre></div>

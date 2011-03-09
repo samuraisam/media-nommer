@@ -136,31 +136,32 @@ dict for FFmpegNommer:</p>
     'options': [
         {
             # These would be passed as infile options to ffmpeg
-            'infile_options': {
-            },
+            'infile_options': [
+            ],
             # These are passed as outfile options to ffmpeg
-            'outfile_options': {
-                's': '320x240',
+            'outfile_options': [
+                ('s', '320x240'),
                 # Some flags don't have values, like sameq
-                'sameq': None,
-                'ar': '22050',
-                'ab': '48',
-            }
+                ('sameq', None),
+                ('ar', '22050'),
+                ('ab', '48'),
+            ],
         }, # end pass 1
-    ], # end encoding pass list (max of 2)
+        
+        # If you are doing a 2-pass encoding, copy/paste the first
+        # dict in this list and append that here. You'll need to
+        # specify pass numbers and vpre's, but that's just straight
+        # FFmpeg stuff.
+
+    ], # end encoding options pass list (max of 2)
 } # end preset</pre>
 </div>
 <p>In this case, the command created by this nommer would end up being:</p>
 <div class="highlight-python"><pre>ffmpeg -y -i &lt;infilename&gt; -s 320x240 -sameq -ar 22050 -ab 48 &lt;outfilename&gt;</pre>
 </div>
-<p>Note that the <tt class="docutils literal"><span class="pre">sameq</span></tt> key in our <tt class="docutils literal"><span class="pre">outfile_options</span></tt> dict above has a
-<tt class="xref docutils literal"><span class="pre">None</span></tt> value. You&#8217;ll need to do this for flags or options that don&#8217;t
-require a value.</p>
-<div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">Everything specified in the <tt class="docutils literal"><span class="pre">options</span></tt> dict may be overridden
-in your encoding API requests. These merely act as presets.</p>
-</div>
+<p>Note that the <tt class="docutils literal"><span class="pre">sameq</span></tt> key, value tuple in our <tt class="docutils literal"><span class="pre">outfile_options</span></tt> dict 
+above has a <tt class="xref docutils literal"><span class="pre">None</span></tt> value. You&#8217;ll need to do this for flags or options 
+that don&#8217;t require a value.</p>
 <p>If you want no options by default, this is OK too:</p>
 <div class="highlight-python"><pre>'minimal_preset': {
     'nommer': 'media_nommer.ec2nommerd.nommers.ffmpeg.FFmpegNommer'

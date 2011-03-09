@@ -162,12 +162,16 @@ want to add these settings values (at minimum):</p>
         <span class="c"># This options dict will vary wildly depending on which</span>
         <span class="c"># Nommer you are using. This example only holds true for</span>
         <span class="c"># the FFmpegNommer</span>
-        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c"># These are passed as infile options to ffmpeg</span>
-            <span class="s">&#39;infile_options&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="c"># These are passed as outfile options to ffmpeg</span>
-            <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="p">}</span>
+        <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="c"># These are passed as infile options to ffmpeg</span>
+                <span class="s">&#39;infile_options&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="c"># These are passed as outfile options to ffmpeg</span>
+                <span class="s">&#39;outfile_options&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="s">&#39;threads&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">],</span>
     <span class="p">},</span>
 <span class="p">}</span>
 </pre></div>
